@@ -1,13 +1,20 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Zishu AI — Your Voice, Your Assistant</title>
-    <meta name="description" content="Zishu is a personal AI voice assistant that you can use directly from the web. Talk naturally, ask questions, and get help." />
+    <title>Zishu — Your Personal AI Assistant</title>
+    <meta name="description" content="Zishu is a personal AI voice assistant. Talk naturally, ask questions, and get help through voice." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet" />
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js">
+    </script>
+
     <style>
         /* ============================================================
            BASE RESET & VARIABLES
@@ -41,6 +48,7 @@
             --zishu-tool-bg: #e9edf4;
             --zishu-stop-bg: #f8d7da;
             --zishu-action-bg: #d4edda;
+            --modal-overlay: rgba(0, 0, 0, 0.4);
         }
 
         [data-theme="dark"] {
@@ -64,6 +72,7 @@
             --zishu-tool-bg: #1a2438;
             --zishu-stop-bg: #2a1a1a;
             --zishu-action-bg: #1a2a1a;
+            --modal-overlay: rgba(0, 0, 0, 0.6);
         }
 
         body {
@@ -73,6 +82,8 @@
             line-height: 1.5;
             transition: background 0.2s, color 0.2s;
             padding: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
         }
 
         /* ============================================================
@@ -106,6 +117,7 @@
             letter-spacing: -0.3px;
             color: var(--text);
             text-decoration: none;
+            cursor: pointer;
         }
         .logo span {
             color: var(--accent);
@@ -125,11 +137,16 @@
         .nav-links a:hover {
             color: var(--text);
         }
+        .nav-links a.active {
+            color: var(--accent);
+            font-weight: 500;
+        }
         .nav-actions {
             display: flex;
             align-items: center;
-            gap: 1.2rem;
+            gap: 1rem;
         }
+
         .theme-toggle {
             background: var(--surface2);
             border: 1px solid var(--border);
@@ -147,6 +164,7 @@
         .theme-toggle:hover {
             background: var(--border);
         }
+
         .btn-primary {
             background: var(--accent);
             color: #fff;
@@ -182,6 +200,49 @@
             background: var(--surface2);
             border-color: var(--text-secondary);
         }
+
+        .btn-ghost {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            padding: 0.4rem 1rem;
+            border-radius: 60px;
+            font-weight: 500;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-ghost:hover {
+            background: var(--surface2);
+            color: var(--text);
+        }
+
+        .btn-google {
+            background: #ffffff;
+            color: #1a2332;
+            border: 1px solid var(--border);
+            padding: 0.5rem 1.4rem;
+            border-radius: 60px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        [data-theme="dark"] .btn-google {
+            background: #1a2332;
+            color: #e8edf5;
+        }
+        .btn-google:hover {
+            background: var(--surface2);
+        }
+        .btn-google svg {
+            width: 18px;
+            height: 18px;
+        }
+
         .hamburger {
             display: none;
             flex-direction: column;
@@ -198,89 +259,120 @@
             transition: 0.2s;
         }
 
-        /* ============================================================
-           CONTAINER
-           ============================================================ */
-        .container {
-            max-width: var(--max-width);
-            margin: 0 auto;
-            padding: 1rem 1.5rem 3rem;
-        }
-
-        /* ============================================================
-           HERO
-           ============================================================ */
-        .hero {
+        /* User avatar in nav */
+        .user-menu {
             display: flex;
             align-items: center;
-            gap: 4rem;
-            padding: 2rem 0 2rem;
-            flex-wrap: wrap;
+            gap: 0.8rem;
+            position: relative;
         }
-        .hero-content {
-            flex: 1 1 45%;
+        .user-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            overflow: hidden;
+            border: 2px solid transparent;
+            transition: border-color 0.2s;
         }
-        .hero-badge {
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            padding: 0.2rem 1rem;
-            border-radius: 60px;
-            font-size: 0.75rem;
+        .user-avatar:hover {
+            border-color: var(--accent);
+        }
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .user-name {
+            font-size: 0.85rem;
             font-weight: 500;
-            color: var(--text-secondary);
-            display: inline-block;
-            margin-bottom: 1.2rem;
-            letter-spacing: 0.3px;
-        }
-        .hero h1 {
-            font-size: 3.4rem;
-            font-weight: 700;
-            line-height: 1.1;
-            letter-spacing: -1.2px;
-            margin-bottom: 1rem;
-        }
-        .hero h1 .highlight {
-            color: var(--accent);
-        }
-        .hero p {
-            color: var(--text-secondary);
-            font-size: 1.15rem;
-            max-width: 480px;
-            margin-bottom: 2rem;
-        }
-        .hero-actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            align-items: center;
-            margin-bottom: 1.2rem;
+            color: var(--text);
+            display: none;
         }
 
-        /* ============================================================
-           LIVE ZISHU ASSISTANT SECTION
-           ============================================================ */
-        .zishu-live-section {
+        .user-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 2rem 2rem 1.5rem;
-            margin: 2rem 0 3rem;
+            border-radius: 12px;
+            padding: 0.6rem 0;
+            min-width: 180px;
             box-shadow: var(--shadow);
-            transition: background 0.4s ease, border-color 0.4s ease;
+            display: none;
+            z-index: 200;
         }
-        .zishu-live-section .section-label {
+        .user-dropdown.open {
+            display: block;
+        }
+        .user-dropdown-item {
+            padding: 0.6rem 1.2rem;
+            font-size: 0.85rem;
+            color: var(--text);
+            cursor: pointer;
+            transition: background 0.15s;
+            border: none;
+            background: transparent;
+            width: 100%;
+            text-align: left;
+        }
+        .user-dropdown-item:hover {
+            background: var(--surface2);
+        }
+        .user-dropdown-divider {
+            border-top: 1px solid var(--border);
+            margin: 0.4rem 0;
+        }
+
+        /* ============================================================
+           PAGE CONTAINER
+           ============================================================ */
+        .page-container {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 1rem 1.5rem 2rem;
+        }
+
+        /* ============================================================
+           HOME / ASSISTANT PAGE
+           ============================================================ */
+        #home-page {
+            display: block;
+        }
+        #explore-page {
+            display: none;
+        }
+
+        .assistant-wrapper {
+            max-width: 820px;
+            margin: 0 auto;
+        }
+
+        .assistant-header {
             text-align: center;
-            margin-bottom: 0.5rem;
+            padding: 0.5rem 0 0.2rem;
         }
-        .zishu-live-section .section-label h2 {
-            font-size: 2rem;
+        .assistant-header h1 {
+            font-size: 1.8rem;
             font-weight: 700;
             letter-spacing: -0.5px;
+            color: var(--text);
         }
-        .zishu-live-section .section-label p {
+        .assistant-header h1 span {
+            color: var(--accent);
+        }
+        .assistant-header p {
             color: var(--text-secondary);
-            font-size: 1rem;
-            margin-top: 0.2rem;
+            font-size: 0.95rem;
+            margin-top: 0.1rem;
         }
 
         /* ============================================================
@@ -291,10 +383,11 @@
             background: var(--zishu-bg);
             color: var(--zishu-text);
             border-radius: 24px;
-            padding: 16px 20px 12px;
+            padding: 20px 24px 16px;
             transition: background 0.4s ease, color 0.4s ease;
             user-select: none;
             margin-top: 0.5rem;
+            border: 1px solid var(--zishu-border);
         }
         .zishu-assistant.dark-mode {
             background: var(--zishu-bg);
@@ -329,22 +422,11 @@
             background: var(--zishu-action-bg);
             color: #4caf50;
         }
-        .zishu-assistant.dark-mode #zishu-status-badge {
-            background: var(--zishu-tool-bg);
-            color: var(--zishu-text-secondary);
-        }
-        .zishu-assistant.dark-mode #zishu-status-badge.active {
-            background: var(--zishu-user-bg);
-            color: white;
-        }
         .zishu-assistant.dark-mode #zishu-orb-status {
             color: var(--zishu-text);
         }
         .zishu-assistant.dark-mode #zishu-orb-sub {
             color: var(--zishu-text-secondary);
-        }
-        .zishu-assistant.dark-mode #zishu-footer {
-            color: #4a5a7a;
         }
 
         /* Orb Container */
@@ -353,7 +435,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 6px 0 12px;
+            padding: 4px 0 10px;
             flex-shrink: 0;
             position: relative;
             perspective: 800px;
@@ -377,8 +459,13 @@
         }
 
         @keyframes zishu-floatOrb {
-            0%, 100% { transform: translateY(0px) rotateX(0deg); }
-            50% { transform: translateY(-8px) rotateX(2deg); }
+            0%,
+            100% {
+                transform: translateY(0px) rotateX(0deg);
+            }
+            50% {
+                transform: translateY(-8px) rotateX(2deg);
+            }
         }
 
         #zishu-orb-glow {
@@ -395,8 +482,15 @@
             z-index: 0;
         }
         @keyframes zishu-glowPulse {
-            0%, 100% { opacity: 0.6; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.1); }
+            0%,
+            100% {
+                opacity: 0.6;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.1);
+            }
         }
 
         #zishu-orb {
@@ -491,7 +585,8 @@
         }
 
         @keyframes zishu-eyeGlow {
-            0%, 100% {
+            0%,
+            100% {
                 box-shadow: 0 0 20px rgba(59, 130, 246, 0.4), 0 0 40px rgba(59, 130, 246, 0.15);
                 opacity: 1;
             }
@@ -594,9 +689,15 @@
         }
 
         @keyframes zishu-ribbonSpin {
-            0% { transform: rotate(0deg) scale(1); }
-            50% { transform: rotate(180deg) scale(1.02); }
-            100% { transform: rotate(360deg) scale(1); }
+            0% {
+                transform: rotate(0deg) scale(1);
+            }
+            50% {
+                transform: rotate(180deg) scale(1.02);
+            }
+            100% {
+                transform: rotate(360deg) scale(1);
+            }
         }
 
         /* Orb States */
@@ -655,28 +756,59 @@
         }
 
         @keyframes zishu-orbPulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.03); }
+            0%,
+            100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.03);
+            }
         }
         @keyframes zishu-orbSpin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
         }
         @keyframes zishu-orbSpeak {
-            0% { transform: scale(1) translateY(0); }
-            100% { transform: scale(1.02) translateY(-3px); }
+            0% {
+                transform: scale(1) translateY(0);
+            }
+            100% {
+                transform: scale(1.02) translateY(-3px);
+            }
         }
         @keyframes zishu-eyeListening {
-            0%, 100% { height: 16px; width: 12px; }
-            50% { height: 18px; width: 14px; }
+            0%,
+            100% {
+                height: 16px;
+                width: 12px;
+            }
+            50% {
+                height: 18px;
+                width: 14px;
+            }
         }
         @keyframes zishu-eyeThinking {
-            0%, 100% { border-radius: 50%; }
-            50% { border-radius: 30%; }
+            0%,
+            100% {
+                border-radius: 50%;
+            }
+            50% {
+                border-radius: 30%;
+            }
         }
         @keyframes zishu-eyeSpeaking {
-            0% { height: 16px; width: 12px; }
-            100% { height: 20px; width: 10px; }
+            0% {
+                height: 16px;
+                width: 12px;
+            }
+            100% {
+                height: 20px;
+                width: 10px;
+            }
         }
 
         #zishu-orb-status {
@@ -702,8 +834,8 @@
         /* Chat Wrapper */
         #zishu-chat-wrapper {
             flex: 1;
-            min-height: 200px;
-            max-height: 400px;
+            min-height: 180px;
+            max-height: 380px;
             width: 100%;
             margin: 8px auto 0;
             background: var(--zishu-surface);
@@ -721,8 +853,8 @@
             padding: 16px 20px;
             scroll-behavior: smooth;
             will-change: transform;
-            max-height: 320px;
-            min-height: 160px;
+            max-height: 300px;
+            min-height: 140px;
         }
         #zishu-chat-container::-webkit-scrollbar {
             width: 4px;
@@ -841,21 +973,40 @@
         }
 
         /* ============================================================
-           MARKETING SECTIONS
+           EXPLORE / MARKETING PAGE
            ============================================================ */
-        section {
-            margin: 3rem 0;
+        .explore-hero {
+            text-align: center;
+            padding: 2rem 0 1.5rem;
         }
-        .section-title {
-            font-size: 2.4rem;
+        .explore-hero h1 {
+            font-size: 2.8rem;
             font-weight: 700;
-            letter-spacing: -0.6px;
-            margin-bottom: 0.4rem;
+            letter-spacing: -1px;
         }
-        .section-sub {
+        .explore-hero h1 span {
+            color: var(--accent);
+        }
+        .explore-hero p {
             color: var(--text-secondary);
             font-size: 1.1rem;
-            margin-bottom: 2rem;
+            max-width: 560px;
+            margin: 0.5rem auto 1.5rem;
+        }
+
+        .explore-section {
+            margin: 3rem 0;
+        }
+        .explore-section .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 0.3rem;
+        }
+        .explore-section .section-sub {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-bottom: 1.8rem;
         }
         .text-center {
             text-align: center;
@@ -1006,11 +1157,108 @@
             padding-top: 0.8rem;
         }
 
-        /* Footer */
+        /* ============================================================
+           LOGIN MODAL
+           ============================================================ */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--modal-overlay);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 500;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--surface);
+            border-radius: 24px;
+            padding: 2.5rem 2.2rem;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            border: 1px solid var(--border);
+            position: relative;
+            animation: modalFadeIn 0.25s ease;
+        }
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.96) translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1.2rem;
+            background: transparent;
+            border: none;
+            font-size: 1.4rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: 0.2s;
+            padding: 0.2rem 0.5rem;
+            border-radius: 8px;
+        }
+        .modal-close:hover {
+            background: var(--surface2);
+        }
+
+        .modal h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+        .modal p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 1.8rem;
+        }
+
+        .modal .btn-google {
+            width: 100%;
+            justify-content: center;
+            padding: 0.7rem;
+            font-size: 1rem;
+        }
+
+        .modal .guest-option {
+            display: block;
+            text-align: center;
+            margin-top: 1.2rem;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            text-decoration: underline;
+            padding: 0.4rem;
+        }
+        .modal .guest-option:hover {
+            color: var(--text);
+        }
+
+        /* ============================================================
+           FOOTER
+           ============================================================ */
         footer {
             border-top: 1px solid var(--border);
-            padding: 2.5rem 0 1.5rem;
-            margin-top: 3rem;
+            padding: 2rem 0 1.5rem;
+            margin-top: 2rem;
             display: flex;
             flex-wrap: wrap;
             justify-content: space-between;
@@ -1026,6 +1274,7 @@
         footer a {
             color: var(--text-secondary);
             text-decoration: none;
+            cursor: pointer;
         }
         footer a:hover {
             color: var(--text);
@@ -1035,18 +1284,6 @@
            RESPONSIVE
            ============================================================ */
         @media (max-width: 800px) {
-            .hero {
-                flex-direction: column;
-                text-align: center;
-                gap: 2rem;
-            }
-            .hero p {
-                margin-left: auto;
-                margin-right: auto;
-            }
-            .hero-actions {
-                justify-content: center;
-            }
             .nav-links {
                 display: none;
             }
@@ -1065,11 +1302,17 @@
                 gap: 1.2rem;
                 border-bottom: 1px solid var(--border);
             }
-            .section-title {
-                font-size: 2rem;
+            .user-name {
+                display: none;
             }
-            .zishu-live-section {
-                padding: 1.2rem 1rem 1rem;
+            .explore-hero h1 {
+                font-size: 2.2rem;
+            }
+            .assistant-header h1 {
+                font-size: 1.5rem;
+            }
+            .zishu-assistant {
+                padding: 14px 16px 12px;
             }
             #zishu-orb-wrapper {
                 width: 100px;
@@ -1128,30 +1371,49 @@
             }
             #zishu-chat-container {
                 padding: 12px 14px;
-                max-height: 240px;
-                min-height: 120px;
+                max-height: 220px;
+                min-height: 100px;
             }
             #zishu-chat-wrapper {
-                min-height: 160px;
-                max-height: 300px;
+                min-height: 140px;
+                max-height: 280px;
+            }
+            .modal {
+                padding: 2rem 1.5rem;
             }
         }
 
         @media (max-width: 500px) {
-            .container {
-                padding: 0.5rem 1rem 2rem;
+            .page-container {
+                padding: 0.5rem 0.8rem 1.5rem;
             }
-            .hero h1 {
-                font-size: 2.5rem;
+            .zishu-assistant {
+                padding: 10px 10px 8px;
+                border-radius: 16px;
+            }
+            .assistant-header h1 {
+                font-size: 1.3rem;
+            }
+            .explore-hero h1 {
+                font-size: 1.8rem;
             }
             .pricing-card {
                 padding: 1.8rem 1rem;
             }
-            .zishu-live-section {
-                padding: 0.8rem 0.6rem 0.8rem;
+            #zishu-chat-wrapper {
+                min-height: 120px;
+                max-height: 240px;
             }
-            .zishu-assistant {
-                padding: 10px 12px 8px;
+            #zishu-chat-container {
+                max-height: 180px;
+                min-height: 80px;
+                padding: 10px 12px;
+            }
+            .modal {
+                padding: 1.5rem 1.2rem;
+            }
+            .nav-inner {
+                padding: 0 0.8rem;
             }
         }
     </style>
@@ -1163,16 +1425,22 @@
     ============================================================ -->
     <nav id="navbar">
         <div class="nav-inner">
-            <a href="#" class="logo">ZISH<span>U</span></a>
+            <a class="logo" id="nav-logo">ZISH<span>U</span></a>
             <div class="nav-links" id="navLinks">
-                <a href="#features">Features</a>
-                <a href="#howitworks">How It Works</a>
-                <a href="#zishu-live">Try Zishu</a>
-                <a href="#faq">FAQ</a>
+                <a class="active" data-page="home">Home</a>
+                <a data-page="explore">Explore</a>
             </div>
             <div class="nav-actions">
                 <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">☀️</button>
-                <a href="#zishu-live" class="btn-primary">Try Zishu</a>
+                <div class="user-menu" id="userMenu">
+                    <button class="btn-ghost" id="loginBtn">Sign in</button>
+                    <div class="user-avatar" id="userAvatar" style="display:none;"></div>
+                    <div class="user-dropdown" id="userDropdown">
+                        <div class="user-dropdown-item" id="dropdownProfile" style="font-weight:500;"></div>
+                        <div class="user-dropdown-divider"></div>
+                        <button class="user-dropdown-item" id="dropdownSignOut">Sign out</button>
+                    </div>
+                </div>
                 <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
             </div>
         </div>
@@ -1181,167 +1449,150 @@
     <!-- ============================================================
     MAIN CONTAINER
     ============================================================ -->
-    <div class="container">
+    <div class="page-container">
 
         <!-- ============================================================
-        HERO
+        HOME / ASSISTANT PAGE
         ============================================================ -->
-        <section class="hero" id="home">
-            <div class="hero-content">
-                <div class="hero-badge">ZISHU AI • WEB</div>
-                <h1>Your voice.<br /><span class="highlight">Your assistant.</span></h1>
-                <p>Meet Zishu, your personal AI voice assistant. Talk naturally, ask questions, get help, and control supported actions with your voice — directly from the web.</p>
-                <div class="hero-actions">
-                    <a href="#zishu-live" class="btn-primary">Try Zishu</a>
-                    <a href="#features" class="btn-secondary">Explore Features</a>
+        <div id="home-page">
+            <div class="assistant-wrapper">
+                <div class="assistant-header">
+                    <h1>ZISH<span>U</span></h1>
+                    <p>Your personal AI assistant</p>
                 </div>
-            </div>
-            <div style="flex:1;display:flex;justify-content:center;align-items:center;min-height:200px;">
-                <div style="width:160px;height:160px;border-radius:50%;background:radial-gradient(circle at 30% 30%, var(--accent), var(--accent-secondary));box-shadow:0 0 60px rgba(59,130,246,0.15);animation:zishu-floatOrb 4s ease-in-out infinite;"></div>
-            </div>
-        </section>
 
-        <!-- ============================================================
-        LIVE ZISHU ASSISTANT SECTION
-        ============================================================ -->
-        <div class="zishu-live-section" id="zishu-live">
-            <div class="section-label">
-                <h2>Meet Zishu</h2>
-                <p>Talk naturally. Zishu listens, understands and responds.</p>
-            </div>
+                <!-- ZISHU ASSISTANT -->
+                <div class="zishu-assistant" id="zishu-assistant-root">
 
-            <!-- ============================================================
-            ZISHU ASSISTANT — PRESERVED FROM ORIGINAL
-            ============================================================ -->
-            <div class="zishu-assistant" id="zishu-assistant-root">
-
-                <!-- Orb Container -->
-                <div id="zishu-orb-container">
-                    <div id="zishu-orb-wrapper">
-                        <div id="zishu-orb-glow"></div>
-                        <div id="zishu-orb-ribbon">
-                            <div class="zishu-ribbon-wave"></div>
-                            <div class="zishu-ribbon-wave"></div>
-                            <div class="zishu-ribbon-wave"></div>
-                            <div class="zishu-ribbon-wave"></div>
-                        </div>
-                        <div id="zishu-orb">
-                            <div id="zishu-orb-ring"></div>
-                            <div id="zishu-orb-visor">
-                                <div id="zishu-orb-eyes">
-                                    <div class="zishu-eye left"></div>
-                                    <div class="zishu-eye right"></div>
+                    <!-- Orb Container -->
+                    <div id="zishu-orb-container">
+                        <div id="zishu-orb-wrapper">
+                            <div id="zishu-orb-glow"></div>
+                            <div id="zishu-orb-ribbon">
+                                <div class="zishu-ribbon-wave"></div>
+                                <div class="zishu-ribbon-wave"></div>
+                                <div class="zishu-ribbon-wave"></div>
+                                <div class="zishu-ribbon-wave"></div>
+                            </div>
+                            <div id="zishu-orb">
+                                <div id="zishu-orb-ring"></div>
+                                <div id="zishu-orb-visor">
+                                    <div id="zishu-orb-eyes">
+                                        <div class="zishu-eye left"></div>
+                                        <div class="zishu-eye right"></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                        <div id="zishu-orb-status">Tap orb or say "Zishu" to start</div>
+                        <div id="zishu-orb-sub">First tap to enable microphone</div>
                     </div>
-                    <div id="zishu-orb-status">Tap orb or say "Zishu" to start</div>
-                    <div id="zishu-orb-sub">First tap to enable microphone</div>
-                </div>
 
-                <!-- Chat Wrapper -->
-                <div id="zishu-chat-wrapper">
-                    <div id="zishu-chat-container">
-                        <!-- Messages appear here -->
+                    <!-- Chat Wrapper -->
+                    <div id="zishu-chat-wrapper">
+                        <div id="zishu-chat-container">
+                            <!-- Messages appear here -->
+                        </div>
+                    </div>
+
+                    <div id="zishu-footer">
+                        <span>private · local</span>
+                        <span>v2.8</span>
                     </div>
                 </div>
-
-                <div id="zishu-footer">
-                    <span>private · local</span>
-                    <span>v2.8</span>
-                </div>
+                <!-- END ZISHU ASSISTANT -->
             </div>
-            <!-- END ZISHU ASSISTANT -->
         </div>
 
         <!-- ============================================================
-        FEATURES
+        EXPLORE / MARKETING PAGE
         ============================================================ -->
-        <section id="features">
-            <h2 class="section-title">Built to be useful.</h2>
-            <div class="grid-2">
-                <div class="card"><h4>Voice-first</h4><p>Talk naturally instead of typing every command.</p></div>
-                <div class="card"><h4>AI conversations</h4><p>Ask questions and have natural conversations with Zishu.</p></div>
-                <div class="card"><h4>Voice commands</h4><p>Use your voice to perform supported actions.</p></div>
-                <div class="card"><h4>Smart assistance</h4><p>Zishu can understand requests and respond naturally.</p></div>
-                <div class="card"><h4>Hindi + English</h4><p>Zishu can understand Hindi and English conversations.</p></div>
-                <div class="card"><h4>Memory & notes</h4><p>Create useful reminders and save notes using your voice.</p></div>
-            </div>
-        </section>
+        <div id="explore-page">
 
-        <!-- ============================================================
-        HOW IT WORKS
-        ============================================================ -->
-        <section id="howitworks">
-            <h2 class="section-title text-center">How it works</h2>
-            <div class="grid-3">
-                <div class="step"><div class="step-icon">🎤</div><h4>Speak</h4><p style="color:var(--text-secondary)">Tell Zishu what you need.</p></div>
-                <div class="step"><div class="step-icon">🧠</div><h4>Understand</h4><p style="color:var(--text-secondary)">Zishu processes your request and understands what you mean.</p></div>
-                <div class="step"><div class="step-icon">⚡</div><h4>Respond</h4><p style="color:var(--text-secondary)">Zishu gives you an answer or performs a supported action.</p></div>
+            <div class="explore-hero">
+                <h1>Meet ZISH<span>U</span></h1>
+                <p>Your personal AI voice assistant. Talk naturally, ask questions, and get help through voice.</p>
+                <a class="btn-primary" id="exploreUseZishuBtn">Use Zishu</a>
             </div>
-        </section>
 
-        <!-- ============================================================
-        USE CASES
-        ============================================================ -->
-        <section>
-            <h2 class="section-title text-center">Just say what you need.</h2>
-            <div class="use-case-grid">
-                <div class="use-card">"Zishu, YouTube kholo."</div>
-                <div class="use-card">"Zishu, ek note save karo."</div>
-                <div class="use-card">"Zishu, kal 7 baje reminder laga do."</div>
-                <div class="use-card">"Zishu, mujhe weather batao."</div>
-                <div class="use-card">"Zishu, 125 × 48 calculate karo."</div>
+            <!-- Features -->
+            <div class="explore-section">
+                <h2 class="section-title">Built to be useful.</h2>
+                <div class="grid-2">
+                    <div class="card"><h4>Voice-first</h4><p>Talk naturally instead of typing every command.</p></div>
+                    <div class="card"><h4>AI conversations</h4><p>Ask questions and have natural conversations with Zishu.</p></div>
+                    <div class="card"><h4>Voice commands</h4><p>Use your voice to perform supported actions.</p></div>
+                    <div class="card"><h4>Smart assistance</h4><p>Zishu can understand requests and respond naturally.</p></div>
+                    <div class="card"><h4>Hindi + English</h4><p>Zishu understands Hindi and English conversations.</p></div>
+                    <div class="card"><h4>Memory & notes</h4><p>Create reminders and save notes using your voice.</p></div>
+                </div>
             </div>
-        </section>
 
-        <!-- ============================================================
-        PRICING PLACEHOLDER
-        ============================================================ -->
-        <section id="pricing">
-            <h2 class="section-title text-center">Zishu Premium</h2>
-            <div class="pricing-card">
-                <div class="price-label">One-time access</div>
-                <div class="price">₹99</div>
-                <ul>
-                    <li>Full AI voice assistant</li>
-                    <li>Voice interaction</li>
-                    <li>Supported voice commands</li>
-                    <li>Future updates</li>
-                </ul>
-                <button class="btn-primary btn-block btn-coming" disabled>Premium — Coming Soon</button>
-                <div style="margin-top:0.8rem;color:var(--text-secondary);font-size:0.85rem;">No monthly subscription.</div>
+            <!-- How It Works -->
+            <div class="explore-section">
+                <h2 class="section-title text-center">How it works</h2>
+                <div class="grid-3">
+                    <div class="step"><div class="step-icon">🎤</div><h4>Speak</h4><p style="color:var(--text-secondary)">Tell Zishu what you need.</p></div>
+                    <div class="step"><div class="step-icon">🧠</div><h4>Understand</h4><p style="color:var(--text-secondary)">Zishu processes your request and understands what you mean.</p></div>
+                    <div class="step"><div class="step-icon">⚡</div><h4>Respond</h4><p style="color:var(--text-secondary)">Zishu gives you an answer or performs a supported action.</p></div>
+                </div>
             </div>
-        </section>
 
-        <!-- ============================================================
-        PRIVACY
-        ============================================================ -->
-        <section>
-            <h2 class="section-title">Built with privacy in mind.</h2>
-            <p style="color:var(--text-secondary);max-width:600px;">Zishu uses a separate backend to handle AI requests so sensitive API credentials are not embedded directly in the client application.</p>
-            <div style="display:flex;gap:2rem;margin-top:1.5rem;flex-wrap:wrap;">
-                <a href="#" style="color:var(--accent);">Privacy Policy</a>
-                <a href="#" style="color:var(--accent);">Terms of Service</a>
+            <!-- Use Cases -->
+            <div class="explore-section">
+                <h2 class="section-title text-center">Just say what you need.</h2>
+                <div class="use-case-grid">
+                    <div class="use-card">"Zishu, YouTube kholo."</div>
+                    <div class="use-card">"Zishu, ek note save karo."</div>
+                    <div class="use-card">"Zishu, kal 7 baje reminder laga do."</div>
+                    <div class="use-card">"Zishu, mujhe weather batao."</div>
+                    <div class="use-card">"Zishu, 125 × 48 calculate karo."</div>
+                </div>
             </div>
-        </section>
 
-        <!-- ============================================================
-        FAQ
-        ============================================================ -->
-        <section id="faq">
-            <h2 class="section-title">FAQ</h2>
-            <div id="faqContainer">
-                <div class="faq-item"><div class="faq-question">What is Zishu? <span>+</span></div><div class="faq-answer">Zishu is a personal AI voice assistant that you can use directly from the web.</div></div>
-                <div class="faq-item"><div class="faq-question">How do I use Zishu? <span>+</span></div><div class="faq-answer">Open Zishu, tap the Orb and start speaking.</div></div>
-                <div class="faq-item"><div class="faq-question">Does Zishu support voice interaction? <span>+</span></div><div class="faq-answer">Yes. Zishu is designed around voice-first interaction.</div></div>
-                <div class="faq-item"><div class="faq-question">Does Zishu understand Hindi? <span>+</span></div><div class="faq-answer">Yes, Zishu supports Hindi and English interaction.</div></div>
-                <div class="faq-item"><div class="faq-question">Do I need to install an app? <span>+</span></div><div class="faq-answer">No. The primary Zishu experience is available directly through the website.</div></div>
-                <div class="faq-item"><div class="faq-question">Does Zishu require internet? <span>+</span></div><div class="faq-answer">Yes. AI processing requires an internet connection.</div></div>
-                <div class="faq-item"><div class="faq-question">Is Zishu free? <span>+</span></div><div class="faq-answer">Zishu offers a free web version. Premium features are coming soon.</div></div>
-                <div class="faq-item"><div class="faq-question">What data does Zishu collect? <span>+</span></div><div class="faq-answer">Zishu processes voice input solely to respond to your requests. No personal data is stored without consent.</div></div>
+            <!-- Pricing Placeholder -->
+            <div class="explore-section" id="pricing-section">
+                <h2 class="section-title text-center">Zishu Premium</h2>
+                <div class="pricing-card">
+                    <div class="price-label">One-time access</div>
+                    <div class="price">₹99</div>
+                    <ul>
+                        <li>Full AI voice assistant</li>
+                        <li>Voice interaction</li>
+                        <li>Supported voice commands</li>
+                        <li>Future updates</li>
+                    </ul>
+                    <button class="btn-primary btn-block" id="premiumActionBtn">Unlock Premium</button>
+                    <div style="margin-top:0.8rem;color:var(--text-secondary);font-size:0.85rem;">No monthly subscription.</div>
+                </div>
             </div>
-        </section>
+
+            <!-- Privacy -->
+            <div class="explore-section">
+                <h2 class="section-title">Built with privacy in mind.</h2>
+                <p style="color:var(--text-secondary);max-width:600px;">Zishu uses a separate backend to handle AI requests so sensitive API credentials are not embedded directly in the client application.</p>
+                <div style="display:flex;gap:2rem;margin-top:1.5rem;flex-wrap:wrap;">
+                    <a href="#" style="color:var(--accent);">Privacy Policy</a>
+                    <a href="#" style="color:var(--accent);">Terms of Service</a>
+                </div>
+            </div>
+
+            <!-- FAQ -->
+            <div class="explore-section" id="faq-section">
+                <h2 class="section-title">FAQ</h2>
+                <div id="faqContainer">
+                    <div class="faq-item"><div class="faq-question">What is Zishu? <span>+</span></div><div class="faq-answer">Zishu is a personal AI voice assistant that you can use directly from the web.</div></div>
+                    <div class="faq-item"><div class="faq-question">How do I use Zishu? <span>+</span></div><div class="faq-answer">Open Zishu, tap the Orb and start speaking.</div></div>
+                    <div class="faq-item"><div class="faq-question">Does Zishu support voice interaction? <span>+</span></div><div class="faq-answer">Yes. Zishu is designed around voice-first interaction.</div></div>
+                    <div class="faq-item"><div class="faq-question">Does Zishu understand Hindi? <span>+</span></div><div class="faq-answer">Yes, Zishu supports Hindi and English interaction.</div></div>
+                    <div class="faq-item"><div class="faq-question">Do I need to install an app? <span>+</span></div><div class="faq-answer">No. Zishu is available directly through the website.</div></div>
+                    <div class="faq-item"><div class="faq-question">Does Zishu require internet? <span>+</span></div><div class="faq-answer">Yes. AI processing requires an internet connection.</div></div>
+                    <div class="faq-item"><div class="faq-question">Is Zishu free? <span>+</span></div><div class="faq-answer">Zishu offers a free web version. Premium features are coming soon.</div></div>
+                    <div class="faq-item"><div class="faq-question">What data does Zishu collect? <span>+</span></div><div class="faq-answer">Zishu processes voice input solely to respond to your requests. No personal data is stored without consent.</div></div>
+                </div>
+            </div>
+
+        </div>
 
         <!-- ============================================================
         FOOTER
@@ -1349,10 +1600,8 @@
         <footer>
             <div><span style="font-weight:700;">ZISHU</span> <span style="color:var(--text-secondary)">Your voice. Your assistant.</span></div>
             <div class="footer-links">
-                <a href="#features">Features</a>
-                <a href="#howitworks">How It Works</a>
-                <a href="#zishu-live">Try Zishu</a>
-                <a href="#faq">FAQ</a>
+                <a data-page="home">Home</a>
+                <a data-page="explore">Explore</a>
                 <a href="#">Privacy</a>
                 <a href="#">Terms</a>
             </div>
@@ -1360,22 +1609,71 @@
         </footer>
 
     </div>
-    <!-- END CONTAINER -->
+    <!-- END PAGE CONTAINER -->
 
 
     <!-- ============================================================
-    JAVASCRIPT — PRESERVED ZISHU ASSISTANT + MARKETING
+    LOGIN MODAL
+    ============================================================ -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="modal">
+            <button class="modal-close" id="modalClose">×</button>
+            <h2>Sign in to Zishu</h2>
+            <p>Sign in to manage your account and access Premium when available.</p>
+            <button class="btn-google" id="googleSignInBtn">
+                <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                Sign in with Google
+            </button>
+            <button class="guest-option" id="guestContinueBtn">Continue without signing in</button>
+        </div>
+    </div>
+
+
+    <!-- ============================================================
+    JAVASCRIPT
     ============================================================ -->
     <script>
         // ============================================================
-        // MARKETING — Theme, Nav, FAQ
+        // FIREBASE CONFIG
+        // ============================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyCV69BI7Rw-4o4yHQxBp-v0dXvEl7Tpmq0",
+            authDomain: "zishu-ai.firebaseapp.com",
+            databaseURL: "https://zishu-ai-default-rtdb.firebaseio.com",
+            projectId: "zishu-ai",
+            storageBucket: "zishu-ai.firebasestorage.app",
+            messagingSenderId: "266786650911",
+            appId: "1:266786650911:web:207498caea84e3c661ce2a",
+            measurementId: "G-PEXRS2X6JQ"
+        };
+
+        // Initialize Firebase only once
+        let firebaseInitialized = false;
+        let auth = null;
+        let currentUser = null;
+
+        function initFirebase() {
+            if (firebaseInitialized) return;
+            try {
+                firebase.initializeApp(firebaseConfig);
+                auth = firebase.auth();
+                firebaseInitialized = true;
+                console.log('Firebase initialized');
+            } catch (e) {
+                console.warn('Firebase init error:', e);
+            }
+        }
+
+
+        // ============================================================
+        // MARKETING — Theme, Nav, FAQ, Page Switching
         // ============================================================
         (function marketing() {
             // Theme
             const themeToggle = document.getElementById('themeToggle');
             const html = document.documentElement;
-            const savedTheme = localStorage.getItem('zishu-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' :
-                'light');
+            const savedTheme = localStorage.getItem('zishu-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ?
+                'dark' : 'light');
             html.setAttribute('data-theme', savedTheme);
             themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '☾';
 
@@ -1408,12 +1706,59 @@
             hamburger.addEventListener('click', function() {
                 navLinks.classList.toggle('open');
             });
-            // Close nav on link click (mobile)
-            navLinks.querySelectorAll('a').forEach(function(link) {
-                link.addEventListener('click', function() {
+
+            // Page switching
+            const homePage = document.getElementById('home-page');
+            const explorePage = document.getElementById('explore-page');
+            const navLinksItems = navLinks.querySelectorAll('a[data-page]');
+            const footerLinks = document.querySelectorAll('footer a[data-page]');
+            const logo = document.getElementById('nav-logo');
+            const exploreUseBtn = document.getElementById('exploreUseZishuBtn');
+
+            function switchPage(page) {
+                if (page === 'home') {
+                    homePage.style.display = 'block';
+                    explorePage.style.display = 'none';
+                    navLinksItems.forEach(function(el) {
+                        el.classList.toggle('active', el.getAttribute('data-page') === 'home');
+                    });
+                    // Close mobile nav
                     navLinks.classList.remove('open');
+                    // Scroll to top
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                } else if (page === 'explore') {
+                    homePage.style.display = 'none';
+                    explorePage.style.display = 'block';
+                    navLinksItems.forEach(function(el) {
+                        el.classList.toggle('active', el.getAttribute('data-page') === 'explore');
+                    });
+                    navLinks.classList.remove('open');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            }
+
+            navLinksItems.forEach(function(el) {
+                el.addEventListener('click', function() {
+                    switchPage(el.getAttribute('data-page'));
                 });
             });
+
+            footerLinks.forEach(function(el) {
+                el.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    switchPage(el.getAttribute('data-page'));
+                });
+            });
+
+            logo.addEventListener('click', function() {
+                switchPage('home');
+            });
+
+            if (exploreUseBtn) {
+                exploreUseBtn.addEventListener('click', function() {
+                    switchPage('home');
+                });
+            }
 
             // FAQ accordion
             document.querySelectorAll('.faq-item').forEach(function(item) {
@@ -1423,7 +1768,145 @@
                     span.textContent = item.classList.contains('open') ? '−' : '+';
                 });
             });
+
+            // Modal controls
+            const modal = document.getElementById('loginModal');
+            const modalClose = document.getElementById('modalClose');
+            const guestContinue = document.getElementById('guestContinueBtn');
+
+            function openModal() {
+                modal.classList.add('open');
+            }
+
+            function closeModal() {
+                modal.classList.remove('open');
+            }
+
+            modalClose.addEventListener('click', closeModal);
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) closeModal();
+            });
+            guestContinue.addEventListener('click', closeModal);
+
+            // Expose modal functions globally
+            window.openLoginModal = openModal;
+            window.closeLoginModal = closeModal;
+
+            // Premium action
+            document.getElementById('premiumActionBtn').addEventListener('click', function() {
+                if (currentUser) {
+                    alert('Premium purchase will be available here.');
+                } else {
+                    openModal();
+                }
+            });
+
+            // Login button
+            document.getElementById('loginBtn').addEventListener('click', function() {
+                if (currentUser) {
+                    // Toggle dropdown
+                    document.getElementById('userDropdown').classList.toggle('open');
+                } else {
+                    openModal();
+                }
+            });
+
+            // Close dropdown on outside click
+            document.addEventListener('click', function(e) {
+                const menu = document.getElementById('userMenu');
+                const dropdown = document.getElementById('userDropdown');
+                if (menu && !menu.contains(e.target)) {
+                    dropdown.classList.remove('open');
+                }
+            });
+
+            // Sign out
+            document.getElementById('dropdownSignOut').addEventListener('click', function() {
+                if (auth) {
+                    auth.signOut().catch(function(e) { console.warn('Sign out error:', e); });
+                }
+                document.getElementById('userDropdown').classList.remove('open');
+            });
+
+            // Expose switchPage globally for Zishu assistant
+            window.switchPage = switchPage;
+
+            // Start Firebase after DOM ready
+            initFirebase();
+            setupAuthListener();
+
         })();
+
+
+        // ============================================================
+        // FIREBASE AUTH
+        // ============================================================
+        function setupAuthListener() {
+            if (!auth) return;
+
+            auth.onAuthStateChanged(function(user) {
+                currentUser = user;
+                updateUIForAuth(user);
+            });
+        }
+
+        function updateUIForAuth(user) {
+            const loginBtn = document.getElementById('loginBtn');
+            const avatar = document.getElementById('userAvatar');
+            const dropdownProfile = document.getElementById('dropdownProfile');
+            const dropdown = document.getElementById('userDropdown');
+
+            if (user) {
+                loginBtn.style.display = 'none';
+                avatar.style.display = 'flex';
+
+                // Set avatar
+                const displayName = user.displayName || 'User';
+                const photoURL = user.photoURL;
+
+                if (photoURL) {
+                    avatar.innerHTML = '<img src="' + photoURL + '" alt="' + displayName + '" />';
+                } else {
+                    avatar.textContent = displayName.charAt(0).toUpperCase();
+                }
+
+                // Dropdown profile
+                dropdownProfile.textContent = displayName + ' (' + (user.email || '') + ')';
+
+                // Close dropdown after sign out
+            } else {
+                loginBtn.style.display = 'block';
+                avatar.style.display = 'none';
+                avatar.innerHTML = '';
+                dropdownProfile.textContent = '';
+                dropdown.classList.remove('open');
+            }
+        }
+
+        // Google Sign In
+        document.getElementById('googleSignInBtn').addEventListener('click', function() {
+            if (!auth) {
+                alert('Authentication is not available. Please try again.');
+                return;
+            }
+
+            var provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider)
+                .then(function(result) {
+                    // Success - auth state listener will update UI
+                    closeModal();
+                })
+                .catch(function(error) {
+                    console.error('Google sign in error:', error);
+                    var msg = 'Sign-in could not be completed. Please try again.';
+                    if (error.code === 'auth/popup-blocked') {
+                        msg = 'Sign-in popup was blocked. Please allow popups for this site.';
+                    } else if (error.code === 'auth/popup-closed-by-user') {
+                        msg = 'Sign-in was cancelled.';
+                    }
+                    alert(msg);
+                });
+        });
 
 
         // ============================================================
@@ -1453,9 +1936,7 @@
             let isRestartScheduled = false;
             let isFirstActivation = true;
             let conversationHistory = [];
-            let isWebView = false;
             let isStopped = false;
-            let currentResponseText = '';
             let isSpeakingNow = false;
             let utteranceResolve = null;
 
@@ -1511,11 +1992,11 @@
                                 active: true
                             });
                             localStorage.setItem('zishu_alarms', JSON.stringify(alarms));
-                            return '⏰ Alarm set for ' + alarmTime.toLocaleTimeString('hi-IN') +
+                            return 'Alarm set for ' + alarmTime.toLocaleTimeString('hi-IN') +
                                 '. Main yaad dilaunga!';
                         }
                     }
-                    return "⏰ Alarm ke liye time batao jaise 'alarm 7 baje' ya 'alarm 9:30 am'";
+                    return "Alarm ke liye time batao jaise 'alarm 7 baje' ya 'alarm 9:30 am'";
                 }
 
                 // Reminder
@@ -1529,9 +2010,9 @@
                             done: false
                         });
                         localStorage.setItem('zishu_reminders', JSON.stringify(reminders));
-                        return '✅ Reminder saved: "' + match[1].trim() + '". Main yaad dilaunga!';
+                        return 'Reminder saved: "' + match[1].trim() + '". Main yaad dilaunga!';
                     }
-                    return "📝 Reminder ke liye batao jaise 'remind me to call mom' ya 'मुझे दवा लेनी है याद दिलाओ'";
+                    return "Reminder ke liye batao jaise 'remind me to call mom' ya 'मुझे दवा लेनी है याद दिलाओ'";
                 }
 
                 // Notes
@@ -1545,26 +2026,26 @@
                             date: new Date().toISOString()
                         });
                         localStorage.setItem('zishu_notes', JSON.stringify(notes));
-                        return '📝 Note saved: "' + match[1].trim() + '"';
+                        return 'Note saved: "' + match[1].trim() + '"';
                     }
-                    return "📝 Note ke liye batao jaise 'note shopping list' ya 'नोट आज बारिश हो रही है'";
+                    return "Note ke liye batao jaise 'note shopping list' ya 'नोट आज बारिश हो रही है'";
                 }
 
                 // Show notes
                 if (q.includes('show notes') || q.includes('दिखाओ नोट') || q.includes('my notes')) {
                     var notes = JSON.parse(localStorage.getItem('zishu_notes') || '[]');
-                    if (notes.length === 0) return "📝 Koi note nahi hai. Pehle note save karo!";
+                    if (notes.length === 0) return "Koi note nahi hai. Pehle note save karo!";
                     var noteList = notes.map(function(n, i) { return (i + 1) + '. ' + n.text; }).join('\n');
-                    return '📝 Aapke notes:\n' + noteList;
+                    return 'Aapke notes:\n' + noteList;
                 }
 
                 // Show reminders
                 if (q.includes('show reminders') || q.includes('दिखाओ रिमाइंडर') || q.includes('my reminders')) {
                     var reminders = JSON.parse(localStorage.getItem('zishu_reminders') || '[]');
-                    if (reminders.length === 0) return "📝 Koi reminder nahi hai. Pehle reminder set karo!";
+                    if (reminders.length === 0) return "Koi reminder nahi hai. Pehle reminder set karo!";
                     var remList = reminders.filter(function(r) { return !r.done; }).map(function(r, i) { return (i +
                             1) + '. ' + r.text; }).join('\n');
-                    return '📝 Aapke reminders:\n' + remList;
+                    return 'Aapke reminders:\n' + remList;
                 }
 
                 return null;
@@ -1579,7 +2060,7 @@
                         var alarmTime = new Date(alarm.time);
                         if (alarmTime <= now) {
                             alarm.active = false;
-                            var msg = '⏰ ALARM! ' + alarm.message;
+                            var msg = 'ALARM! ' + alarm.message;
                             addToolMessage('🔔 ' + msg);
                             if (!isProcessing) {
                                 speakText('उठो! ' + alarm.message);
@@ -1651,7 +2132,7 @@
             }
 
             // ============================================================
-            // WEBSITE LIST (200+)
+            // WEBSITE LIST
             // ============================================================
             var SITE_ALIASES = {
                 youtube: ['youtube', 'you tube', 'यूट्यूब', 'यू ट्यूब'],
@@ -2138,11 +2619,10 @@
                 }
 
                 isProcessing = false;
-                currentResponseText = '';
 
                 var stopDiv = document.createElement('div');
                 stopDiv.className = 'zishu-stop-msg';
-                stopDiv.textContent = '⏹️ बोलना रोका गया! फिर से सुन रहा हूँ...';
+                stopDiv.textContent = 'Stopped. Listening again...';
                 chatContainer.appendChild(stopDiv);
                 chatContainer.scrollTop = chatContainer.scrollHeight;
 
@@ -2200,7 +2680,7 @@
                                 setTimeout(function() {
                                     startListening();
                                 }, 200);
-                                addToolMessage('🔊 "Zishu" sun liya! Ab bolen...');
+                                addToolMessage('"Zishu" sun liya! Ab bolen...');
                                 return;
                             }
                         }
@@ -2308,7 +2788,7 @@
             }
 
             // ============================================================
-            // FIXED TTS
+            // TTS
             // ============================================================
             function speakText(text) {
                 var cleanText = cleanTextForSpeech(text);
@@ -2502,8 +2982,6 @@
             // STREAMING RESPONSE
             // ============================================================
             function streamResponse(text) {
-                currentResponseText = text;
-
                 if (isStopped) {
                     return null;
                 }
@@ -2621,43 +3099,43 @@
                     var timestampedQuery = query + ' (Current date: ' + new Date().toISOString().split('T')[0] + ')';
 
                     fetch(BACKEND_URL, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            query: timestampedQuery,
-                            history: conversationHistory
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                query: timestampedQuery,
+                                history: conversationHistory
+                            })
                         })
-                    })
-                    .then(function(response) {
-                        if (!response.ok) {
-                            throw new Error('Server error: ' + response.status);
-                        }
-                        return response.json();
-                    })
-                    .then(function(data) {
-                        conversationHistory = data.history || [];
-                        if (isStopped) {
+                        .then(function(response) {
+                            if (!response.ok) {
+                                throw new Error('Server error: ' + response.status);
+                            }
+                            return response.json();
+                        })
+                        .then(function(data) {
+                            conversationHistory = data.history || [];
+                            if (isStopped) {
+                                isProcessing = false;
+                                return;
+                            }
+                            streamResponse(data.response);
                             isProcessing = false;
-                            return;
-                        }
-                        streamResponse(data.response);
-                        isProcessing = false;
-                        if (!isStopped && state !== STATE.LISTENING && !isSpeakingNow) {
-                            setTimeout(function() {
-                                if (state !== STATE.SPEAKING && !isStopped && !isSpeakingNow) {
-                                    setOrbState(STATE.IDLE);
-                                    scheduleRestart(1000);
-                                }
-                            }, 500);
-                        }
-                    })
-                    .catch(function(error) {
-                        addToolMessage('Error: ' + error.message);
-                        setOrbState(STATE.IDLE);
-                        isProcessing = false;
-                    });
+                            if (!isStopped && state !== STATE.LISTENING && !isSpeakingNow) {
+                                setTimeout(function() {
+                                    if (state !== STATE.SPEAKING && !isStopped && !isSpeakingNow) {
+                                        setOrbState(STATE.IDLE);
+                                        scheduleRestart(1000);
+                                    }
+                                }, 500);
+                            }
+                        })
+                        .catch(function(error) {
+                            addToolMessage('Error: ' + error.message);
+                            setOrbState(STATE.IDLE);
+                            isProcessing = false;
+                        });
 
                 } catch (error) {
                     addToolMessage('Error: ' + error.message);
@@ -2667,7 +3145,7 @@
             }
 
             // ============================================================
-            // KEYBOARD SHORTCUT - Space to toggle/stop
+            // KEYBOARD SHORTCUT
             // ============================================================
             document.addEventListener('keydown', function(e) {
                 if (e.code === 'Space' && !e.repeat && !e.target.matches('input, textarea, button, a')) {
@@ -2711,24 +3189,12 @@
                 assistantRoot.classList.add('dark-mode');
             }
 
-            // Theme toggle sync from marketing
-            var themeToggleBtn = document.getElementById('themeToggle');
-            if (themeToggleBtn) {
-                var origToggle = themeToggleBtn.click;
-                themeToggleBtn.addEventListener('click', function() {
-                    var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-                    if (isDark) {
-                        assistantRoot.classList.add('dark-mode');
-                    } else {
-                        assistantRoot.classList.remove('dark-mode');
-                    }
-                });
-            }
-
-            console.log('🚀 Zishu AI v2.8 — Merged');
-            console.log('✅ Voice assistant preserved');
-            console.log('✅ Marketing website integrated');
+            console.log('Zishu AI v2.8 — Home + Explore + Firebase Auth');
+            console.log('Voice assistant preserved');
+            console.log('Marketing content moved to Explore page');
+            console.log('Google Login added (optional)');
         })();
     </script>
+
 </body>
 </html>
