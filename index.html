@@ -1,0 +1,2734 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zishu AI — Your Voice, Your Assistant</title>
+    <meta name="description" content="Zishu is a personal AI voice assistant that you can use directly from the web. Talk naturally, ask questions, and get help." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet" />
+    <style>
+        /* ============================================================
+           BASE RESET & VARIABLES
+           ============================================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #F7F9FC;
+            --surface: #FFFFFF;
+            --surface2: #f1f4f9;
+            --text: #111827;
+            --text-secondary: #64748B;
+            --border: #E5E7EB;
+            --accent: #3B82F6;
+            --accent-secondary: #6366F1;
+            --shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+            --radius: 20px;
+            --max-width: 1160px;
+            --nav-bg: rgba(247, 249, 252, 0.85);
+            --zishu-bg: #f4f7fc;
+            --zishu-surface: #FFFFFF;
+            --zishu-border: #e9edf4;
+            --zishu-text: #1a2332;
+            --zishu-text-secondary: #6b7a8f;
+            --zishu-assistant-bg: #f1f4f9;
+            --zishu-user-bg: #3b82f6;
+            --zishu-tool-bg: #e9edf4;
+            --zishu-stop-bg: #f8d7da;
+            --zishu-action-bg: #d4edda;
+        }
+
+        [data-theme="dark"] {
+            --bg: #0B0F14;
+            --surface: #111827;
+            --surface2: #172033;
+            --text: #F8FAFC;
+            --text-secondary: #94A3B8;
+            --border: #253044;
+            --accent: #60A5FA;
+            --accent-secondary: #818CF8;
+            --shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+            --nav-bg: rgba(11, 15, 20, 0.88);
+            --zishu-bg: #0a0e17;
+            --zishu-surface: #131b2e;
+            --zishu-border: #1e2a3f;
+            --zishu-text: #e8edf5;
+            --zishu-text-secondary: #8aa0c0;
+            --zishu-assistant-bg: #1a2438;
+            --zishu-user-bg: #3b82f6;
+            --zishu-tool-bg: #1a2438;
+            --zishu-stop-bg: #2a1a1a;
+            --zishu-action-bg: #1a2a1a;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+            transition: background 0.2s, color 0.2s;
+            padding: 0;
+        }
+
+        /* ============================================================
+           NAV
+           ============================================================ */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--nav-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            padding: 0.6rem 0;
+            transition: box-shadow 0.2s, background 0.2s;
+        }
+        nav.scrolled {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+        }
+        .nav-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+        .logo {
+            font-weight: 700;
+            font-size: 1.25rem;
+            letter-spacing: -0.3px;
+            color: var(--text);
+            text-decoration: none;
+        }
+        .logo span {
+            color: var(--accent);
+        }
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            font-size: 0.9rem;
+        }
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+            cursor: pointer;
+        }
+        .nav-links a:hover {
+            color: var(--text);
+        }
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+        }
+        .theme-toggle {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 60px;
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: 0.2s;
+        }
+        .theme-toggle:hover {
+            background: var(--border);
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            padding: 0.5rem 1.4rem;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            text-decoration: none;
+            display: inline-block;
+            letter-spacing: -0.2px;
+        }
+        .btn-primary:hover {
+            background: var(--accent-secondary);
+            transform: scale(0.97);
+        }
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.5rem 1.4rem;
+            border-radius: 60px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-secondary:hover {
+            background: var(--surface2);
+            border-color: var(--text-secondary);
+        }
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 4px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+        }
+        .hamburger span {
+            width: 24px;
+            height: 2px;
+            background: var(--text);
+            border-radius: 4px;
+            transition: 0.2s;
+        }
+
+        /* ============================================================
+           CONTAINER
+           ============================================================ */
+        .container {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 1rem 1.5rem 3rem;
+        }
+
+        /* ============================================================
+           HERO
+           ============================================================ */
+        .hero {
+            display: flex;
+            align-items: center;
+            gap: 4rem;
+            padding: 2rem 0 2rem;
+            flex-wrap: wrap;
+        }
+        .hero-content {
+            flex: 1 1 45%;
+        }
+        .hero-badge {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            padding: 0.2rem 1rem;
+            border-radius: 60px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            display: inline-block;
+            margin-bottom: 1.2rem;
+            letter-spacing: 0.3px;
+        }
+        .hero h1 {
+            font-size: 3.4rem;
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -1.2px;
+            margin-bottom: 1rem;
+        }
+        .hero h1 .highlight {
+            color: var(--accent);
+        }
+        .hero p {
+            color: var(--text-secondary);
+            font-size: 1.15rem;
+            max-width: 480px;
+            margin-bottom: 2rem;
+        }
+        .hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            margin-bottom: 1.2rem;
+        }
+
+        /* ============================================================
+           LIVE ZISHU ASSISTANT SECTION
+           ============================================================ */
+        .zishu-live-section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 2rem 2rem 1.5rem;
+            margin: 2rem 0 3rem;
+            box-shadow: var(--shadow);
+            transition: background 0.4s ease, border-color 0.4s ease;
+        }
+        .zishu-live-section .section-label {
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+        .zishu-live-section .section-label h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        .zishu-live-section .section-label p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-top: 0.2rem;
+        }
+
+        /* ============================================================
+           ZISHU ASSISTANT — PRESERVED FROM ORIGINAL
+           ============================================================ */
+        .zishu-assistant {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--zishu-bg);
+            color: var(--zishu-text);
+            border-radius: 24px;
+            padding: 16px 20px 12px;
+            transition: background 0.4s ease, color 0.4s ease;
+            user-select: none;
+            margin-top: 0.5rem;
+        }
+        .zishu-assistant.dark-mode {
+            background: var(--zishu-bg);
+            color: var(--zishu-text);
+        }
+        .zishu-assistant.dark-mode #zishu-chat-wrapper {
+            background: var(--zishu-surface);
+            border-color: var(--zishu-border);
+        }
+        .zishu-assistant.dark-mode #zishu-chat-container::-webkit-scrollbar-track {
+            background: #1a2438;
+        }
+        .zishu-assistant.dark-mode #zishu-chat-container::-webkit-scrollbar-thumb {
+            background: #2a3a55;
+        }
+        .zishu-assistant.dark-mode .zishu-assistant-msg {
+            background: var(--zishu-assistant-bg);
+            color: var(--zishu-text);
+        }
+        .zishu-assistant.dark-mode .zishu-user-msg {
+            background: var(--zishu-user-bg);
+        }
+        .zishu-assistant.dark-mode .zishu-tool-msg {
+            background: var(--zishu-tool-bg);
+            color: var(--zishu-text-secondary);
+        }
+        .zishu-assistant.dark-mode .zishu-stop-msg {
+            background: var(--zishu-stop-bg);
+            color: #ff6b6b;
+        }
+        .zishu-assistant.dark-mode .zishu-action-msg {
+            background: var(--zishu-action-bg);
+            color: #4caf50;
+        }
+        .zishu-assistant.dark-mode #zishu-status-badge {
+            background: var(--zishu-tool-bg);
+            color: var(--zishu-text-secondary);
+        }
+        .zishu-assistant.dark-mode #zishu-status-badge.active {
+            background: var(--zishu-user-bg);
+            color: white;
+        }
+        .zishu-assistant.dark-mode #zishu-orb-status {
+            color: var(--zishu-text);
+        }
+        .zishu-assistant.dark-mode #zishu-orb-sub {
+            color: var(--zishu-text-secondary);
+        }
+        .zishu-assistant.dark-mode #zishu-footer {
+            color: #4a5a7a;
+        }
+
+        /* Orb Container */
+        #zishu-orb-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 0 12px;
+            flex-shrink: 0;
+            position: relative;
+            perspective: 800px;
+        }
+
+        #zishu-orb-wrapper {
+            width: 130px;
+            height: 130px;
+            position: relative;
+            transform-style: preserve-3d;
+            cursor: pointer;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            animation: zishu-floatOrb 4s ease-in-out infinite;
+            z-index: 10;
+        }
+        #zishu-orb-wrapper:hover {
+            transform: scale(1.05) rotateX(2deg);
+        }
+        #zishu-orb-wrapper:active {
+            transform: scale(0.95);
+        }
+
+        @keyframes zishu-floatOrb {
+            0%, 100% { transform: translateY(0px) rotateX(0deg); }
+            50% { transform: translateY(-8px) rotateX(2deg); }
+        }
+
+        #zishu-orb-glow {
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            top: -25px;
+            left: -25px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+            filter: blur(20px);
+            animation: zishu-glowPulse 3s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+        @keyframes zishu-glowPulse {
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.1); }
+        }
+
+        #zishu-orb {
+            position: relative;
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            background: radial-gradient(ellipse at 30% 25%, #ffffff, #e8ecf0 50%, #c8ced6 80%, #b0b8c4);
+            box-shadow:
+                inset -20px -20px 40px rgba(0, 0, 0, 0.12),
+                inset 15px 15px 30px rgba(255, 255, 255, 0.8),
+                0 20px 60px rgba(59, 130, 246, 0.15),
+                0 0 40px rgba(59, 130, 246, 0.05);
+            transform: rotateX(-5deg) rotateY(-5deg);
+            transition: all 0.6s ease;
+            z-index: 1;
+            cursor: pointer;
+            background-image:
+                radial-gradient(ellipse at 35% 30%, rgba(255, 255, 255, 0.9) 0%, transparent 60%),
+                radial-gradient(ellipse at 65% 70%, rgba(200, 210, 220, 0.3) 0%, transparent 40%),
+                radial-gradient(ellipse at 80% 20%, rgba(255, 255, 255, 0.2) 0%, transparent 30%);
+        }
+
+        #zishu-orb-ring {
+            position: absolute;
+            width: 140px;
+            height: 140px;
+            top: -5px;
+            left: -5px;
+            border-radius: 50%;
+            border: 2px solid rgba(59, 130, 246, 0.08);
+            box-shadow: inset 0 0 30px rgba(59, 130, 246, 0.03);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        #zishu-orb-visor {
+            position: absolute;
+            width: 80px;
+            height: 56px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotateX(5deg);
+            border-radius: 50%;
+            background: radial-gradient(ellipse at 45% 40%, #2a2a3a, #0a0a12 60%, #000000);
+            box-shadow:
+                inset -5px -5px 15px rgba(0, 0, 0, 0.5),
+                inset 5px 5px 15px rgba(255, 255, 255, 0.05),
+                0 0 30px rgba(59, 130, 246, 0.08);
+            z-index: 2;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            overflow: hidden;
+        }
+        #zishu-orb-visor::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 12px;
+            width: 20px;
+            height: 12px;
+            border-radius: 50%;
+            background: radial-gradient(ellipse, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+            transform: rotate(-20deg);
+        }
+
+        #zishu-orb-eyes {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            gap: 20px;
+            z-index: 3;
+        }
+        .zishu-eye {
+            width: 12px;
+            height: 16px;
+            border-radius: 50%;
+            background: radial-gradient(ellipse at 50% 40%, #8cf0ff, #3b82f6 50%, #1a4a8a);
+            box-shadow:
+                0 0 20px rgba(59, 130, 246, 0.4),
+                0 0 40px rgba(59, 130, 246, 0.15),
+                inset 0 2px 4px rgba(255, 255, 255, 0.3);
+            animation: zishu-eyeGlow 3s ease-in-out infinite;
+            transition: all 0.3s ease;
+        }
+        .zishu-eye.left {
+            animation-delay: 0.2s;
+        }
+        .zishu-eye.right {
+            animation-delay: 0.8s;
+        }
+
+        @keyframes zishu-eyeGlow {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(59, 130, 246, 0.4), 0 0 40px rgba(59, 130, 246, 0.15);
+                opacity: 1;
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(59, 130, 246, 0.6), 0 0 60px rgba(59, 130, 246, 0.25);
+                opacity: 0.95;
+            }
+        }
+
+        .zishu-eye::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.6);
+            filter: blur(1px);
+        }
+
+        /* Energy Ribbon */
+        #zishu-orb-ribbon {
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            top: -25px;
+            left: -25px;
+            z-index: 4;
+            pointer-events: none;
+            transform: rotateX(-10deg) rotateY(5deg);
+            filter: drop-shadow(0 0 30px rgba(59, 130, 246, 0.15));
+        }
+
+        .zishu-ribbon-wave {
+            position: absolute;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            border-top-color: #3b82f6;
+            border-right-color: #7b6cf7;
+            border-bottom-color: #4fc3f7;
+            border-left-color: #00bcd4;
+            opacity: 0.6;
+            animation: zishu-ribbonSpin 8s linear infinite;
+            filter: blur(1px);
+        }
+        .zishu-ribbon-wave:nth-child(1) {
+            width: 170px;
+            height: 170px;
+            top: 5px;
+            left: 5px;
+            border-width: 3px;
+            animation-duration: 12s;
+            border-top-color: #3b82f6;
+            border-right-color: #64b5f6;
+            border-bottom-color: #4fc3f7;
+            border-left-color: #00bcd4;
+            opacity: 0.5;
+        }
+        .zishu-ribbon-wave:nth-child(2) {
+            width: 155px;
+            height: 155px;
+            top: 12px;
+            left: 12px;
+            border-width: 2.5px;
+            animation-duration: 9s;
+            animation-direction: reverse;
+            border-top-color: #7b6cf7;
+            border-right-color: #3b82f6;
+            border-bottom-color: #00bcd4;
+            border-left-color: #4fc3f7;
+            opacity: 0.4;
+        }
+        .zishu-ribbon-wave:nth-child(3) {
+            width: 140px;
+            height: 140px;
+            top: 20px;
+            left: 20px;
+            border-width: 2px;
+            animation-duration: 15s;
+            border-top-color: #4fc3f7;
+            border-right-color: #3b82f6;
+            border-bottom-color: #7b6cf7;
+            border-left-color: #64b5f6;
+            opacity: 0.35;
+        }
+        .zishu-ribbon-wave:nth-child(4) {
+            width: 125px;
+            height: 125px;
+            top: 27px;
+            left: 27px;
+            border-width: 2px;
+            animation-duration: 7s;
+            animation-direction: reverse;
+            border-top-color: #00bcd4;
+            border-right-color: #4fc3f7;
+            border-bottom-color: #3b82f6;
+            border-left-color: #7b6cf7;
+            opacity: 0.3;
+        }
+
+        @keyframes zishu-ribbonSpin {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.02); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
+        /* Orb States */
+        #zishu-orb-wrapper.listening #zishu-orb {
+            box-shadow:
+                inset -20px -20px 40px rgba(0, 0, 0, 0.12),
+                inset 15px 15px 30px rgba(255, 255, 255, 0.8),
+                0 20px 60px rgba(59, 130, 246, 0.3),
+                0 0 80px rgba(59, 130, 246, 0.1);
+            animation: zishu-orbPulse 1.2s ease-in-out infinite;
+        }
+        #zishu-orb-wrapper.listening #zishu-orb-visor {
+            box-shadow:
+                inset -5px -5px 15px rgba(0, 0, 0, 0.5),
+                inset 5px 5px 15px rgba(255, 255, 255, 0.05),
+                0 0 50px rgba(59, 130, 246, 0.15);
+        }
+        #zishu-orb-wrapper.listening .zishu-eye {
+            animation: zishu-eyeListening 0.8s ease-in-out infinite;
+        }
+
+        #zishu-orb-wrapper.thinking #zishu-orb {
+            box-shadow:
+                inset -20px -20px 40px rgba(0, 0, 0, 0.12),
+                inset 15px 15px 30px rgba(255, 255, 255, 0.8),
+                0 20px 60px rgba(123, 108, 247, 0.3),
+                0 0 80px rgba(123, 108, 247, 0.1);
+            animation: zishu-orbSpin 2s linear infinite;
+        }
+        #zishu-orb-wrapper.thinking #zishu-orb-visor {
+            box-shadow:
+                inset -5px -5px 15px rgba(0, 0, 0, 0.5),
+                inset 5px 5px 15px rgba(255, 255, 255, 0.05),
+                0 0 50px rgba(123, 108, 247, 0.15);
+        }
+        #zishu-orb-wrapper.thinking .zishu-eye {
+            animation: zishu-eyeThinking 1.2s ease-in-out infinite;
+        }
+
+        #zishu-orb-wrapper.speaking #zishu-orb {
+            box-shadow:
+                inset -20px -20px 40px rgba(0, 0, 0, 0.12),
+                inset 15px 15px 30px rgba(255, 255, 255, 0.8),
+                0 20px 60px rgba(59, 130, 246, 0.35),
+                0 0 100px rgba(59, 130, 246, 0.15);
+            animation: zishu-orbSpeak 0.6s ease-in-out infinite alternate;
+        }
+        #zishu-orb-wrapper.speaking #zishu-orb-visor {
+            box-shadow:
+                inset -5px -5px 15px rgba(0, 0, 0, 0.5),
+                inset 5px 5px 15px rgba(255, 255, 255, 0.05),
+                0 0 60px rgba(59, 130, 246, 0.2);
+        }
+        #zishu-orb-wrapper.speaking .zishu-eye {
+            animation: zishu-eyeSpeaking 0.4s ease-in-out infinite alternate;
+        }
+
+        @keyframes zishu-orbPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+        @keyframes zishu-orbSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes zishu-orbSpeak {
+            0% { transform: scale(1) translateY(0); }
+            100% { transform: scale(1.02) translateY(-3px); }
+        }
+        @keyframes zishu-eyeListening {
+            0%, 100% { height: 16px; width: 12px; }
+            50% { height: 18px; width: 14px; }
+        }
+        @keyframes zishu-eyeThinking {
+            0%, 100% { border-radius: 50%; }
+            50% { border-radius: 30%; }
+        }
+        @keyframes zishu-eyeSpeaking {
+            0% { height: 16px; width: 12px; }
+            100% { height: 20px; width: 10px; }
+        }
+
+        #zishu-orb-status {
+            margin-top: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--zishu-text);
+            letter-spacing: -0.2px;
+            transition: color 0.3s ease;
+            z-index: 5;
+            position: relative;
+        }
+        #zishu-orb-sub {
+            font-size: 13px;
+            color: var(--zishu-text-secondary);
+            margin-top: 3px;
+            font-weight: 400;
+            transition: color 0.3s ease;
+            z-index: 5;
+            position: relative;
+        }
+
+        /* Chat Wrapper */
+        #zishu-chat-wrapper {
+            flex: 1;
+            min-height: 200px;
+            max-height: 400px;
+            width: 100%;
+            margin: 8px auto 0;
+            background: var(--zishu-surface);
+            border-radius: 20px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+            border: 1px solid var(--zishu-border);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: background 0.4s ease, border-color 0.4s ease;
+        }
+        #zishu-chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 20px;
+            scroll-behavior: smooth;
+            will-change: transform;
+            max-height: 320px;
+            min-height: 160px;
+        }
+        #zishu-chat-container::-webkit-scrollbar {
+            width: 4px;
+        }
+        #zishu-chat-container::-webkit-scrollbar-track {
+            background: #f1f4f9;
+            transition: background 0.3s ease;
+        }
+        #zishu-chat-container::-webkit-scrollbar-thumb {
+            background: #d0d8e3;
+            border-radius: 10px;
+        }
+
+        .zishu-message {
+            margin: 6px 0;
+            padding: 10px 16px;
+            border-radius: 16px;
+            max-width: 85%;
+            word-wrap: break-word;
+            animation: zishu-fadeIn 0.25s ease;
+            line-height: 1.6;
+            font-size: 14px;
+            font-weight: 400;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+            will-change: transform, opacity;
+        }
+        .zishu-user-msg {
+            background: var(--zishu-user-bg);
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 4px;
+        }
+        .zishu-assistant-msg {
+            background: var(--zishu-assistant-bg);
+            color: var(--zishu-text);
+            margin-right: auto;
+            border-bottom-left-radius: 4px;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+        .zishu-message .zishu-sender {
+            font-weight: 600;
+            font-size: 11px;
+            opacity: 0.7;
+            display: block;
+            margin-bottom: 2px;
+            letter-spacing: 0.3px;
+        }
+        .zishu-assistant-msg .zishu-sender {
+            color: var(--zishu-text-secondary);
+        }
+        .zishu-user-msg .zishu-sender {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        .zishu-message .zishu-content {
+            display: block;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .zishu-tool-msg {
+            background: var(--zishu-tool-bg);
+            color: var(--zishu-text-secondary);
+            margin: 4px auto;
+            padding: 4px 14px;
+            border-radius: 30px;
+            font-size: 12px;
+            text-align: center;
+            max-width: 90%;
+            font-weight: 450;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+        .zishu-stop-msg {
+            background: var(--zishu-stop-bg);
+            color: #721c24;
+            margin: 4px auto;
+            padding: 4px 14px;
+            border-radius: 30px;
+            font-size: 12px;
+            text-align: center;
+            max-width: 90%;
+            font-weight: 450;
+            animation: zishu-fadeIn 0.3s ease;
+        }
+        .zishu-action-msg {
+            background: var(--zishu-action-bg);
+            color: #155724;
+            margin: 4px auto;
+            padding: 4px 14px;
+            border-radius: 30px;
+            font-size: 12px;
+            text-align: center;
+            max-width: 90%;
+            font-weight: 450;
+            animation: zishu-fadeIn 0.3s ease;
+        }
+
+        #zishu-footer {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 4px 0;
+            flex-shrink: 0;
+            font-size: 11px;
+            color: #9aa9bb;
+            letter-spacing: 0.2px;
+            transition: color 0.3s ease;
+        }
+
+        @keyframes zishu-fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ============================================================
+           MARKETING SECTIONS
+           ============================================================ */
+        section {
+            margin: 3rem 0;
+        }
+        .section-title {
+            font-size: 2.4rem;
+            font-weight: 700;
+            letter-spacing: -0.6px;
+            margin-bottom: 0.4rem;
+        }
+        .section-sub {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+        .text-center {
+            text-align: center;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.8rem;
+        }
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 2rem;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.8rem 1.4rem;
+            transition: 0.2s;
+            box-shadow: var(--shadow);
+        }
+        .card:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent);
+        }
+        .card h4 {
+            margin-bottom: 0.3rem;
+            font-weight: 600;
+        }
+        .card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .step {
+            text-align: center;
+        }
+        .step-icon {
+            font-size: 2.2rem;
+            background: var(--surface);
+            width: 72px;
+            height: 72px;
+            border-radius: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            border: 1px solid var(--border);
+        }
+
+        .use-case-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.2rem;
+        }
+        .use-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 60px;
+            padding: 0.8rem 1.4rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            text-align: center;
+            color: var(--text);
+            transition: 0.2s;
+            cursor: default;
+        }
+        .use-card:hover {
+            border-color: var(--accent);
+        }
+
+        /* Pricing Placeholder */
+        .pricing-card {
+            max-width: 420px;
+            margin: 0 auto;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 2.5rem 2rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+        .pricing-card .price {
+            font-size: 3.4rem;
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin: 0.5rem 0;
+        }
+        .pricing-card .price-label {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        .pricing-card ul {
+            list-style: none;
+            text-align: left;
+            margin: 1.8rem 0;
+        }
+        .pricing-card ul li {
+            padding: 0.3rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            color: var(--text-secondary);
+        }
+        .pricing-card ul li::before {
+            content: "✓";
+            color: var(--accent);
+            font-weight: 700;
+        }
+        .btn-block {
+            width: 100%;
+            padding: 0.9rem;
+            font-size: 1rem;
+        }
+        .btn-coming {
+            opacity: 0.6;
+            cursor: default;
+        }
+        .btn-coming:hover {
+            transform: none;
+            background: var(--accent);
+        }
+
+        /* FAQ */
+        .faq-item {
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 0;
+            cursor: pointer;
+        }
+        .faq-question {
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.25s ease, padding 0.2s;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+        .faq-item.open .faq-answer {
+            max-height: 300px;
+            padding-top: 0.8rem;
+        }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 2.5rem 0 1.5rem;
+            margin-top: 3rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        footer .footer-links {
+            display: flex;
+            gap: 1.8rem;
+            flex-wrap: wrap;
+        }
+        footer a {
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+        footer a:hover {
+            color: var(--text);
+        }
+
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+        @media (max-width: 800px) {
+            .hero {
+                flex-direction: column;
+                text-align: center;
+                gap: 2rem;
+            }
+            .hero p {
+                margin-left: auto;
+                margin-right: auto;
+            }
+            .hero-actions {
+                justify-content: center;
+            }
+            .nav-links {
+                display: none;
+            }
+            .hamburger {
+                display: flex;
+            }
+            .nav-links.open {
+                display: flex;
+                flex-direction: column;
+                position: absolute;
+                top: 60px;
+                left: 0;
+                right: 0;
+                background: var(--surface);
+                padding: 1.5rem;
+                gap: 1.2rem;
+                border-bottom: 1px solid var(--border);
+            }
+            .section-title {
+                font-size: 2rem;
+            }
+            .zishu-live-section {
+                padding: 1.2rem 1rem 1rem;
+            }
+            #zishu-orb-wrapper {
+                width: 100px;
+                height: 100px;
+            }
+            #zishu-orb {
+                width: 100px;
+                height: 100px;
+            }
+            #zishu-orb-visor {
+                width: 62px;
+                height: 44px;
+            }
+            #zishu-orb-eyes {
+                gap: 16px;
+            }
+            .zishu-eye {
+                width: 10px;
+                height: 13px;
+            }
+            #zishu-orb-ribbon {
+                width: 140px;
+                height: 140px;
+                top: -20px;
+                left: -20px;
+            }
+            .zishu-ribbon-wave:nth-child(1) {
+                width: 135px;
+                height: 135px;
+            }
+            .zishu-ribbon-wave:nth-child(2) {
+                width: 120px;
+                height: 120px;
+            }
+            .zishu-ribbon-wave:nth-child(3) {
+                width: 108px;
+                height: 108px;
+            }
+            .zishu-ribbon-wave:nth-child(4) {
+                width: 96px;
+                height: 96px;
+            }
+            #zishu-orb-glow {
+                width: 140px;
+                height: 140px;
+                top: -20px;
+                left: -20px;
+            }
+            #zishu-orb-status {
+                font-size: 14px;
+            }
+            .zishu-message {
+                font-size: 13px;
+                padding: 8px 12px;
+                max-width: 90%;
+            }
+            #zishu-chat-container {
+                padding: 12px 14px;
+                max-height: 240px;
+                min-height: 120px;
+            }
+            #zishu-chat-wrapper {
+                min-height: 160px;
+                max-height: 300px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .container {
+                padding: 0.5rem 1rem 2rem;
+            }
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            .pricing-card {
+                padding: 1.8rem 1rem;
+            }
+            .zishu-live-section {
+                padding: 0.8rem 0.6rem 0.8rem;
+            }
+            .zishu-assistant {
+                padding: 10px 12px 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================================
+    NAV
+    ============================================================ -->
+    <nav id="navbar">
+        <div class="nav-inner">
+            <a href="#" class="logo">ZISH<span>U</span></a>
+            <div class="nav-links" id="navLinks">
+                <a href="#features">Features</a>
+                <a href="#howitworks">How It Works</a>
+                <a href="#zishu-live">Try Zishu</a>
+                <a href="#faq">FAQ</a>
+            </div>
+            <div class="nav-actions">
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">☀️</button>
+                <a href="#zishu-live" class="btn-primary">Try Zishu</a>
+                <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ============================================================
+    MAIN CONTAINER
+    ============================================================ -->
+    <div class="container">
+
+        <!-- ============================================================
+        HERO
+        ============================================================ -->
+        <section class="hero" id="home">
+            <div class="hero-content">
+                <div class="hero-badge">ZISHU AI • WEB</div>
+                <h1>Your voice.<br /><span class="highlight">Your assistant.</span></h1>
+                <p>Meet Zishu, your personal AI voice assistant. Talk naturally, ask questions, get help, and control supported actions with your voice — directly from the web.</p>
+                <div class="hero-actions">
+                    <a href="#zishu-live" class="btn-primary">Try Zishu</a>
+                    <a href="#features" class="btn-secondary">Explore Features</a>
+                </div>
+            </div>
+            <div style="flex:1;display:flex;justify-content:center;align-items:center;min-height:200px;">
+                <div style="width:160px;height:160px;border-radius:50%;background:radial-gradient(circle at 30% 30%, var(--accent), var(--accent-secondary));box-shadow:0 0 60px rgba(59,130,246,0.15);animation:zishu-floatOrb 4s ease-in-out infinite;"></div>
+            </div>
+        </section>
+
+        <!-- ============================================================
+        LIVE ZISHU ASSISTANT SECTION
+        ============================================================ -->
+        <div class="zishu-live-section" id="zishu-live">
+            <div class="section-label">
+                <h2>Meet Zishu</h2>
+                <p>Talk naturally. Zishu listens, understands and responds.</p>
+            </div>
+
+            <!-- ============================================================
+            ZISHU ASSISTANT — PRESERVED FROM ORIGINAL
+            ============================================================ -->
+            <div class="zishu-assistant" id="zishu-assistant-root">
+
+                <!-- Orb Container -->
+                <div id="zishu-orb-container">
+                    <div id="zishu-orb-wrapper">
+                        <div id="zishu-orb-glow"></div>
+                        <div id="zishu-orb-ribbon">
+                            <div class="zishu-ribbon-wave"></div>
+                            <div class="zishu-ribbon-wave"></div>
+                            <div class="zishu-ribbon-wave"></div>
+                            <div class="zishu-ribbon-wave"></div>
+                        </div>
+                        <div id="zishu-orb">
+                            <div id="zishu-orb-ring"></div>
+                            <div id="zishu-orb-visor">
+                                <div id="zishu-orb-eyes">
+                                    <div class="zishu-eye left"></div>
+                                    <div class="zishu-eye right"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="zishu-orb-status">Tap orb or say "Zishu" to start</div>
+                    <div id="zishu-orb-sub">First tap to enable microphone</div>
+                </div>
+
+                <!-- Chat Wrapper -->
+                <div id="zishu-chat-wrapper">
+                    <div id="zishu-chat-container">
+                        <!-- Messages appear here -->
+                    </div>
+                </div>
+
+                <div id="zishu-footer">
+                    <span>private · local</span>
+                    <span>v2.8</span>
+                </div>
+            </div>
+            <!-- END ZISHU ASSISTANT -->
+        </div>
+
+        <!-- ============================================================
+        FEATURES
+        ============================================================ -->
+        <section id="features">
+            <h2 class="section-title">Built to be useful.</h2>
+            <div class="grid-2">
+                <div class="card"><h4>Voice-first</h4><p>Talk naturally instead of typing every command.</p></div>
+                <div class="card"><h4>AI conversations</h4><p>Ask questions and have natural conversations with Zishu.</p></div>
+                <div class="card"><h4>Voice commands</h4><p>Use your voice to perform supported actions.</p></div>
+                <div class="card"><h4>Smart assistance</h4><p>Zishu can understand requests and respond naturally.</p></div>
+                <div class="card"><h4>Hindi + English</h4><p>Zishu can understand Hindi and English conversations.</p></div>
+                <div class="card"><h4>Memory & notes</h4><p>Create useful reminders and save notes using your voice.</p></div>
+            </div>
+        </section>
+
+        <!-- ============================================================
+        HOW IT WORKS
+        ============================================================ -->
+        <section id="howitworks">
+            <h2 class="section-title text-center">How it works</h2>
+            <div class="grid-3">
+                <div class="step"><div class="step-icon">🎤</div><h4>Speak</h4><p style="color:var(--text-secondary)">Tell Zishu what you need.</p></div>
+                <div class="step"><div class="step-icon">🧠</div><h4>Understand</h4><p style="color:var(--text-secondary)">Zishu processes your request and understands what you mean.</p></div>
+                <div class="step"><div class="step-icon">⚡</div><h4>Respond</h4><p style="color:var(--text-secondary)">Zishu gives you an answer or performs a supported action.</p></div>
+            </div>
+        </section>
+
+        <!-- ============================================================
+        USE CASES
+        ============================================================ -->
+        <section>
+            <h2 class="section-title text-center">Just say what you need.</h2>
+            <div class="use-case-grid">
+                <div class="use-card">"Zishu, YouTube kholo."</div>
+                <div class="use-card">"Zishu, ek note save karo."</div>
+                <div class="use-card">"Zishu, kal 7 baje reminder laga do."</div>
+                <div class="use-card">"Zishu, mujhe weather batao."</div>
+                <div class="use-card">"Zishu, 125 × 48 calculate karo."</div>
+            </div>
+        </section>
+
+        <!-- ============================================================
+        PRICING PLACEHOLDER
+        ============================================================ -->
+        <section id="pricing">
+            <h2 class="section-title text-center">Zishu Premium</h2>
+            <div class="pricing-card">
+                <div class="price-label">One-time access</div>
+                <div class="price">₹99</div>
+                <ul>
+                    <li>Full AI voice assistant</li>
+                    <li>Voice interaction</li>
+                    <li>Supported voice commands</li>
+                    <li>Future updates</li>
+                </ul>
+                <button class="btn-primary btn-block btn-coming" disabled>Premium — Coming Soon</button>
+                <div style="margin-top:0.8rem;color:var(--text-secondary);font-size:0.85rem;">No monthly subscription.</div>
+            </div>
+        </section>
+
+        <!-- ============================================================
+        PRIVACY
+        ============================================================ -->
+        <section>
+            <h2 class="section-title">Built with privacy in mind.</h2>
+            <p style="color:var(--text-secondary);max-width:600px;">Zishu uses a separate backend to handle AI requests so sensitive API credentials are not embedded directly in the client application.</p>
+            <div style="display:flex;gap:2rem;margin-top:1.5rem;flex-wrap:wrap;">
+                <a href="#" style="color:var(--accent);">Privacy Policy</a>
+                <a href="#" style="color:var(--accent);">Terms of Service</a>
+            </div>
+        </section>
+
+        <!-- ============================================================
+        FAQ
+        ============================================================ -->
+        <section id="faq">
+            <h2 class="section-title">FAQ</h2>
+            <div id="faqContainer">
+                <div class="faq-item"><div class="faq-question">What is Zishu? <span>+</span></div><div class="faq-answer">Zishu is a personal AI voice assistant that you can use directly from the web.</div></div>
+                <div class="faq-item"><div class="faq-question">How do I use Zishu? <span>+</span></div><div class="faq-answer">Open Zishu, tap the Orb and start speaking.</div></div>
+                <div class="faq-item"><div class="faq-question">Does Zishu support voice interaction? <span>+</span></div><div class="faq-answer">Yes. Zishu is designed around voice-first interaction.</div></div>
+                <div class="faq-item"><div class="faq-question">Does Zishu understand Hindi? <span>+</span></div><div class="faq-answer">Yes, Zishu supports Hindi and English interaction.</div></div>
+                <div class="faq-item"><div class="faq-question">Do I need to install an app? <span>+</span></div><div class="faq-answer">No. The primary Zishu experience is available directly through the website.</div></div>
+                <div class="faq-item"><div class="faq-question">Does Zishu require internet? <span>+</span></div><div class="faq-answer">Yes. AI processing requires an internet connection.</div></div>
+                <div class="faq-item"><div class="faq-question">Is Zishu free? <span>+</span></div><div class="faq-answer">Zishu offers a free web version. Premium features are coming soon.</div></div>
+                <div class="faq-item"><div class="faq-question">What data does Zishu collect? <span>+</span></div><div class="faq-answer">Zishu processes voice input solely to respond to your requests. No personal data is stored without consent.</div></div>
+            </div>
+        </section>
+
+        <!-- ============================================================
+        FOOTER
+        ============================================================ -->
+        <footer>
+            <div><span style="font-weight:700;">ZISHU</span> <span style="color:var(--text-secondary)">Your voice. Your assistant.</span></div>
+            <div class="footer-links">
+                <a href="#features">Features</a>
+                <a href="#howitworks">How It Works</a>
+                <a href="#zishu-live">Try Zishu</a>
+                <a href="#faq">FAQ</a>
+                <a href="#">Privacy</a>
+                <a href="#">Terms</a>
+            </div>
+            <div style="color:var(--text-secondary);">© 2026 Zishu. All rights reserved.</div>
+        </footer>
+
+    </div>
+    <!-- END CONTAINER -->
+
+
+    <!-- ============================================================
+    JAVASCRIPT — PRESERVED ZISHU ASSISTANT + MARKETING
+    ============================================================ -->
+    <script>
+        // ============================================================
+        // MARKETING — Theme, Nav, FAQ
+        // ============================================================
+        (function marketing() {
+            // Theme
+            const themeToggle = document.getElementById('themeToggle');
+            const html = document.documentElement;
+            const savedTheme = localStorage.getItem('zishu-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' :
+                'light');
+            html.setAttribute('data-theme', savedTheme);
+            themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '☾';
+
+            themeToggle.addEventListener('click', function() {
+                const current = html.getAttribute('data-theme');
+                const next = current === 'dark' ? 'light' : 'dark';
+                html.setAttribute('data-theme', next);
+                localStorage.setItem('zishu-theme', next);
+                themeToggle.textContent = next === 'dark' ? '☀️' : '☾';
+                // Sync dark mode with Zishu assistant
+                const assistant = document.getElementById('zishu-assistant-root');
+                if (assistant) {
+                    if (next === 'dark') {
+                        assistant.classList.add('dark-mode');
+                    } else {
+                        assistant.classList.remove('dark-mode');
+                    }
+                }
+            });
+
+            // Nav scroll
+            const nav = document.getElementById('navbar');
+            window.addEventListener('scroll', function() {
+                nav.classList.toggle('scrolled', window.scrollY > 20);
+            });
+
+            // Hamburger
+            const hamburger = document.getElementById('hamburger');
+            const navLinks = document.getElementById('navLinks');
+            hamburger.addEventListener('click', function() {
+                navLinks.classList.toggle('open');
+            });
+            // Close nav on link click (mobile)
+            navLinks.querySelectorAll('a').forEach(function(link) {
+                link.addEventListener('click', function() {
+                    navLinks.classList.remove('open');
+                });
+            });
+
+            // FAQ accordion
+            document.querySelectorAll('.faq-item').forEach(function(item) {
+                item.querySelector('.faq-question').addEventListener('click', function() {
+                    item.classList.toggle('open');
+                    const span = this.querySelector('span');
+                    span.textContent = item.classList.contains('open') ? '−' : '+';
+                });
+            });
+        })();
+
+
+        // ============================================================
+        // ZISHU ASSISTANT — COMPLETE PRESERVED FROM ORIGINAL
+        // ============================================================
+        (function zishuAssistant() {
+            // ============================================================
+            // CONFIG
+            // ============================================================
+            const BACKEND_URL = 'https://zishu-backend.onrender.com/api/chat';
+
+            // ============================================================
+            // STATE MACHINE
+            // ============================================================
+            const STATE = {
+                IDLE: 'idle',
+                LISTENING: 'listening',
+                THINKING: 'thinking',
+                SPEAKING: 'speaking'
+            };
+
+            let state = STATE.IDLE;
+            let recognition = null;
+            let isProcessing = false;
+            let currentUtterance = null;
+            let restartTimer = null;
+            let isRestartScheduled = false;
+            let isFirstActivation = true;
+            let conversationHistory = [];
+            let isWebView = false;
+            let isStopped = false;
+            let currentResponseText = '';
+            let isSpeakingNow = false;
+            let utteranceResolve = null;
+
+            // ============================================================
+            // DOM REFS (scoped to Zishu)
+            // ============================================================
+            const orbWrapper = document.getElementById('zishu-orb-wrapper');
+            const orbStatus = document.getElementById('zishu-orb-status');
+            const orbSub = document.getElementById('zishu-orb-sub');
+            const chatContainer = document.getElementById('zishu-chat-container');
+            const assistantRoot = document.getElementById('zishu-assistant-root');
+
+            // ============================================================
+            // WAKE WORDS
+            // ============================================================
+            const WAKE_WORDS = ['zishu', 'hey zishu', 'hi zishu', 'hello zishu', 'ok zishu'];
+
+            function isWakeWord(query) {
+                const q = query.toLowerCase().trim();
+                return WAKE_WORDS.some(function(word) { return q === word || q.includes(word); });
+            }
+
+            // ============================================================
+            // ACTION HANDLERS - Alarm, Reminder, Notes
+            // ============================================================
+            function handleActions(query) {
+                var q = query.toLowerCase().trim();
+
+                // Alarm
+                if (q.includes('alarm') || q.includes('अलार्म') || q.includes('alarm lagao')) {
+                    var timeMatch = q.match(/(\d{1,2})\s*(?:baje|:|\s*)(\d{0,2})?\s*(?:am|pm|सुबह|शाम|रात)?/i);
+                    if (timeMatch) {
+                        var hours = parseInt(timeMatch[1]);
+                        var minutes = parseInt(timeMatch[2]) || 0;
+                        if (q.includes('pm') || q.includes('शाम') || q.includes('रात')) {
+                            if (hours < 12) hours += 12;
+                        }
+                        if (q.includes('am') || q.includes('सुबह')) {
+                            if (hours === 12) hours = 0;
+                        }
+                        var alarmTime = new Date();
+                        alarmTime.setHours(hours, minutes, 0, 0);
+                        var now = new Date();
+                        if (alarmTime < now) {
+                            alarmTime.setDate(alarmTime.getDate() + 1);
+                        }
+                        var diff = alarmTime - now;
+                        if (diff > 0) {
+                            var alarms = JSON.parse(localStorage.getItem('zishu_alarms') || '[]');
+                            alarms.push({
+                                time: alarmTime.toISOString(),
+                                message: query,
+                                active: true
+                            });
+                            localStorage.setItem('zishu_alarms', JSON.stringify(alarms));
+                            return '⏰ Alarm set for ' + alarmTime.toLocaleTimeString('hi-IN') +
+                                '. Main yaad dilaunga!';
+                        }
+                    }
+                    return "⏰ Alarm ke liye time batao jaise 'alarm 7 baje' ya 'alarm 9:30 am'";
+                }
+
+                // Reminder
+                if (q.includes('remind') || q.includes('reminder') || q.includes('याद') || q.includes('याद दिलाओ')) {
+                    var match = q.match(/(?:remind|याद दिलाओ|reminder)\s*(?:me|मुझे)?\s*(?:to|कि)?\s*(.+)/i);
+                    if (match && match[1]) {
+                        var reminders = JSON.parse(localStorage.getItem('zishu_reminders') || '[]');
+                        reminders.push({
+                            text: match[1].trim(),
+                            date: new Date().toISOString(),
+                            done: false
+                        });
+                        localStorage.setItem('zishu_reminders', JSON.stringify(reminders));
+                        return '✅ Reminder saved: "' + match[1].trim() + '". Main yaad dilaunga!';
+                    }
+                    return "📝 Reminder ke liye batao jaise 'remind me to call mom' ya 'मुझे दवा लेनी है याद दिलाओ'";
+                }
+
+                // Notes
+                if (q.includes('note') || q.includes('नोट') || q.includes('save') || q.includes('सेव') || q.includes(
+                        'save note')) {
+                    var match = q.match(/(?:note|नोट|save|सेव)\s*(?:this|यह)?\s*(.+)/i);
+                    if (match && match[1]) {
+                        var notes = JSON.parse(localStorage.getItem('zishu_notes') || '[]');
+                        notes.push({
+                            text: match[1].trim(),
+                            date: new Date().toISOString()
+                        });
+                        localStorage.setItem('zishu_notes', JSON.stringify(notes));
+                        return '📝 Note saved: "' + match[1].trim() + '"';
+                    }
+                    return "📝 Note ke liye batao jaise 'note shopping list' ya 'नोट आज बारिश हो रही है'";
+                }
+
+                // Show notes
+                if (q.includes('show notes') || q.includes('दिखाओ नोट') || q.includes('my notes')) {
+                    var notes = JSON.parse(localStorage.getItem('zishu_notes') || '[]');
+                    if (notes.length === 0) return "📝 Koi note nahi hai. Pehle note save karo!";
+                    var noteList = notes.map(function(n, i) { return (i + 1) + '. ' + n.text; }).join('\n');
+                    return '📝 Aapke notes:\n' + noteList;
+                }
+
+                // Show reminders
+                if (q.includes('show reminders') || q.includes('दिखाओ रिमाइंडर') || q.includes('my reminders')) {
+                    var reminders = JSON.parse(localStorage.getItem('zishu_reminders') || '[]');
+                    if (reminders.length === 0) return "📝 Koi reminder nahi hai. Pehle reminder set karo!";
+                    var remList = reminders.filter(function(r) { return !r.done; }).map(function(r, i) { return (i +
+                            1) + '. ' + r.text; }).join('\n');
+                    return '📝 Aapke reminders:\n' + remList;
+                }
+
+                return null;
+            }
+
+            // Check alarms periodically
+            function checkAlarms() {
+                var alarms = JSON.parse(localStorage.getItem('zishu_alarms') || '[]');
+                var now = new Date();
+                alarms.forEach(function(alarm, index) {
+                    if (alarm.active) {
+                        var alarmTime = new Date(alarm.time);
+                        if (alarmTime <= now) {
+                            alarm.active = false;
+                            var msg = '⏰ ALARM! ' + alarm.message;
+                            addToolMessage('🔔 ' + msg);
+                            if (!isProcessing) {
+                                speakText('उठो! ' + alarm.message);
+                            }
+                            localStorage.setItem('zishu_alarms', JSON.stringify(alarms));
+                        }
+                    }
+                });
+            }
+            setInterval(checkAlarms, 30000);
+
+            // ============================================================
+            // STOP WORDS
+            // ============================================================
+            var STOP_WORDS = [
+                'stop', 'ruko', 'bas', 'band karo', 'band kar', 'rok', 'rok do',
+                'बंद करो', 'बंद कर', 'रुको', 'बस', 'बस करो', 'रोको',
+                'enough', 'thats enough', 'bass', 'rokna', 'rok do',
+                'quit', 'cancel', 'shut up', 'chup', 'चुप'
+            ];
+
+            // ============================================================
+            // SPECIAL CHARACTERS TO REMOVE FROM SPEECH
+            // ============================================================
+            var SPECIAL_CHARS = {
+                '*': ' ',
+                '_': ' ',
+                '-': ' ',
+                '•': ' ',
+                '·': ' ',
+                '➡️': ' ',
+                '👉': ' ',
+                '✅': ' ',
+                '⭐': ' ',
+                '🔹': ' ',
+                '🔸': ' ',
+                '▪️': ' ',
+                '▫️': ' ',
+                '◆': ' ',
+                '◇': ' ',
+                '●': ' ',
+                '○': ' ',
+                '★': ' ',
+                '☆': ' '
+            };
+
+            function cleanTextForSpeech(text) {
+                var cleaned = text;
+                for (var key in SPECIAL_CHARS) {
+                    if (SPECIAL_CHARS.hasOwnProperty(key)) {
+                        cleaned = cleaned.split(key).join(SPECIAL_CHARS[key]);
+                    }
+                }
+                cleaned = cleaned.replace(/\s+/g, ' ');
+                cleaned = cleaned.replace(/\*\*/g, '');
+                cleaned = cleaned.replace(/\*/g, '');
+                cleaned = cleaned.replace(/\_\_/g, '');
+                cleaned = cleaned.replace(/\_/g, '');
+                cleaned = cleaned.replace(/\~\~/g, '');
+                cleaned = cleaned.replace(/\~/g, '');
+                cleaned = cleaned.replace(/^#+\s*/gm, '');
+                cleaned = cleaned.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
+                cleaned = cleaned.replace(/```[\s\S]*?```/g, '');
+                cleaned = cleaned.replace(/`[^`]*`/g, '');
+                cleaned = cleaned.replace(/^\s*[-*+]\s+/gm, '');
+                cleaned = cleaned.replace(/^\s*\d+\.\s+/gm, '');
+                cleaned = cleaned.replace(/\s+/g, ' ').trim();
+                return cleaned;
+            }
+
+            // ============================================================
+            // WEBSITE LIST (200+)
+            // ============================================================
+            var SITE_ALIASES = {
+                youtube: ['youtube', 'you tube', 'यूट्यूब', 'यू ट्यूब'],
+                instagram: ['instagram', 'insta', 'इंस्टाग्राम', 'इंस्टा'],
+                facebook: ['facebook', 'fb', 'फेसबुक', 'फेसबुक'],
+                twitter: ['twitter', 'x', 'ट्विटर', 'ट्विटर'],
+                whatsapp: ['whatsapp', 'whats app', 'व्हाट्सएप', 'व्हाट्सऐप'],
+                telegram: ['telegram', 'टेलीग्राम', 'टेलीग्राम'],
+                snapchat: ['snapchat', 'स्नैपचैट', 'स्नैपचैट'],
+                pinterest: ['pinterest', 'पिनट्रेस्ट', 'पिनट्रेस्ट'],
+                tumblr: ['tumblr', 'टम्बलर', 'टम्बलर'],
+                linkedin: ['linkedin', 'linkdin', 'लिंक्डइन', 'लिंक्डइन'],
+                reddit: ['reddit', 'रेडिट', 'रेडिट'],
+                discord: ['discord', 'डिस्कॉर्ड', 'डिस्कॉर्ड'],
+                tiktok: ['tiktok', 'टिकटॉक', 'टिकटोक'],
+                threads: ['threads', 'थ्रेड्स', 'थ्रेड्स'],
+                bluesky: ['bluesky', 'ब्लूस्काई', 'ब्लूस्काई'],
+                mastodon: ['mastodon', 'मास्टोडन', 'मास्टोडन'],
+                google: ['google', 'गूगल', 'गूगल'],
+                gmail: ['gmail', 'जीमेल', 'जी मेल'],
+                maps: ['google maps', 'maps', 'गूगल मैप्स', 'मैप्स', 'map'],
+                drive: ['google drive', 'drive', 'गूगल ड्राइव', 'ड्राइव'],
+                docs: ['google docs', 'docs', 'गूगल डॉक्स', 'डॉक्स'],
+                sheets: ['google sheets', 'sheets', 'गूगल शीट्स', 'शीट्स'],
+                slides: ['google slides', 'slides', 'गूगल स्लाइड्स', 'स्लाइड्स'],
+                translate: ['google translate', 'translate', 'गूगल ट्रांसलेट', 'ट्रांसलेट'],
+                calendar: ['google calendar', 'calendar', 'गूगल कैलेंडर', 'कैलेंडर'],
+                photos: ['google photos', 'photos', 'गूगल फोटो', 'फोटो'],
+                keep: ['google keep', 'keep', 'गूगल कीप', 'कीप'],
+                tasks: ['google tasks', 'tasks', 'गूगल टास्क', 'टास्क'],
+                meet: ['google meet', 'meet', 'गूगल मीट', 'मीट'],
+                netflix: ['netflix', 'नेटफ्लिक्स', 'नेटफ्लिक्स'],
+                spotify: ['spotify', 'स्पॉटिफाई', 'स्पॉटिफाई', 'स्पॉटिफाय'],
+                primevideo: ['prime video', 'amazon prime', 'prime', 'प्राइम वीडियो', 'प्राइम'],
+                hotstar: ['hotstar', 'हॉटस्टार', 'हॉटस्टार'],
+                sonyliv: ['sony liv', 'sonyliv', 'सोनी लिव', 'सोनी'],
+                voot: ['voot', 'वूट', 'वूट'],
+                zee5: ['zee5', 'z5', 'ज़ी5', 'ज़ी'],
+                mxplayer: ['mx player', 'mx', 'एमएक्स प्लेयर', 'एमएक्स'],
+                jiosaavn: ['jiosaavn', 'saavn', 'जियोसावन', 'सावन'],
+                wynk: ['wynk', 'विन्क', 'विन्क'],
+                gaana: ['gaana', 'गाना', 'गाना'],
+                hungama: ['hungama', 'हंगामा', 'हंगामा'],
+                apple: ['apple music', 'apple', 'एप्पल म्यूजिक', 'एप्पल'],
+                soundcloud: ['soundcloud', 'साउंडक्लाउड', 'साउंडक्लाउड'],
+                tidal: ['tidal', 'टाइडल', 'टाइडल'],
+                amazon: ['amazon', 'अमेज़न', 'अमेजन', 'अमेज़न'],
+                flipkart: ['flipkart', 'फ्लिपकार्ट', 'फ्लिपकार्ट'],
+                myntra: ['myntra', 'मिंत्रा', 'मिंत्रा'],
+                ajio: ['ajio', 'अजियो', 'अजियो'],
+                nykaa: ['nykaa', 'नायका', 'नायका'],
+                meesho: ['meesho', 'मीशो', 'मीशो'],
+                snapdeal: ['snapdeal', 'स्नैपडील', 'स्नैपडील'],
+                paytm: ['paytm', 'पेटीएम', 'पेटीएम'],
+                phonepe: ['phonepe', 'फोनपे', 'फोनपे'],
+                gpay: ['google pay', 'gpay', 'गूगल पे', 'गूगलपे'],
+                croma: ['croma', 'क्रोमा', 'क्रोमा'],
+                reliance: ['reliance digital', 'reliance', 'रिलायंस', 'रिलायंस डिजिटल'],
+                tata: ['tata cliq', 'tata', 'ताता क्लिक', 'ताता'],
+                shopclues: ['shopclues', 'शॉपक्लूज़', 'शॉपक्लूज़'],
+                zomato: ['zomato', 'जोमैटो', 'जोमैटो'],
+                swiggy: ['swiggy', 'स्विगी', 'स्विगी'],
+                dominos: ['dominos', 'डोमिनोस', 'डोमिनोज़'],
+                pizza: ['pizza hut', 'पिज़्ज़ा', 'पिज्जा हट'],
+                kfc: ['kfc', 'केएफसी', 'केएफसी'],
+                mcdonalds: ['mcdonalds', 'macdonald', 'मैकडोनाल्ड', 'मैक्डोनाल्ड'],
+                burgerking: ['burger king', 'बर्गर किंग', 'बर्गर किंग'],
+                subway: ['subway', 'सबवे', 'सबवे'],
+                starbucks: ['starbucks', 'स्टारबक्स', 'स्टारबक्स'],
+                uber: ['uber', 'उबर', 'उबर'],
+                ola: ['ola', 'ओला', 'ओला'],
+                timesofindia: ['times of india', 'toi', 'टाइम्स ऑफ इंडिया', 'टाइम्स'],
+                hindustantimes: ['hindustan times', 'हिंदुस्तान टाइम्स', 'हिंदुस्तान'],
+                ndtv: ['ndtv', 'एनडीटीवी', 'एनडीटीवी'],
+                bbc: ['bbc', 'बीबीसी', 'बीबीसी'],
+                cnn: ['cnn', 'सीएनएन', 'सीएनएन'],
+                thehindu: ['the hindu', 'हिन्दू', 'द हिन्दू'],
+                indianexpress: ['indian express', 'इंडियन एक्सप्रेस', 'इंडियन एक्सप्रेस'],
+                livemint: ['livemint', 'लाइवमिंट', 'लाइवमिंट'],
+                moneycontrol: ['moneycontrol', 'मनीकंट्रोल', 'मनीकंट्रोल'],
+                bloomberg: ['bloomberg', 'ब्लूमबर्ग', 'ब्लूमबर्ग'],
+                reuters: ['reuters', 'रॉयटर्स', 'रॉयटर्स'],
+                github: ['github', 'git hub', 'गिटहब', 'गिट हब'],
+                stackoverflow: ['stack overflow', 'stackoverflow', 'स्टैक ओवरफ्लो', 'स्टैक'],
+                codepen: ['codepen', 'कोडपेन', 'कोडपेन'],
+                devto: ['dev.to', 'devto', 'डेव', 'डेव टू'],
+                producthunt: ['product hunt', 'producthunt', 'प्रोडक्ट हंट', 'हंट'],
+                gitlab: ['gitlab', 'गिटलैब', 'गिटलैब'],
+                bitbucket: ['bitbucket', 'बिटबकेट', 'बिटबकेट'],
+                docker: ['docker', 'डॉकर', 'डॉकर'],
+                kubernetes: ['kubernetes', 'k8s', 'कुबेरनेट्स', 'कुबेरनेट्स'],
+                aws: ['aws', 'amazon web services', 'एडब्ल्यूएस', 'एमज़ॉन वेब सर्विस'],
+                azure: ['azure', 'microsoft azure', 'एज़्योर', 'माइक्रोसॉफ्ट एज़्योर'],
+                googlecloud: ['google cloud', 'gcp', 'गूगल क्लाउड', 'जीसीपी'],
+                chatgpt: ['chatgpt', 'chat gpt', 'चैटजीपीटी', 'चैट जीपीटी'],
+                bard: ['bard', 'google bard', 'बार्ड', 'गूगल बार्ड'],
+                claude: ['claude', 'क्लॉड', 'क्लॉड'],
+                perplexity: ['perplexity', 'परप्लेक्सिटी', 'परप्लेक्सिटी'],
+                midjourney: ['midjourney', 'मिडजर्नी', 'मिडजर्नी'],
+                dalle: ['dalle', 'dall-e', 'डाली', 'डाल-ई'],
+                stable: ['stable diffusion', 'स्टेबल डिफ्यूजन', 'स्टेबल डिफ्यूजन'],
+                huggingface: ['hugging face', 'huggingface', 'हगिंग फेस', 'हगिंगफेस'],
+                replicate: ['replicate', 'रिप्लिकेट', 'रिप्लिकेट'],
+                wikipedia: ['wikipedia', 'विकिपीडिया', 'विकिपीडिया'],
+                khanacademy: ['khan academy', 'khanacademy', 'खान अकादमी', 'खान'],
+                coursera: ['coursera', 'कोर्सेरा', 'कोर्सेरा'],
+                udemy: ['udemy', 'यूडेमी', 'यूडेमी'],
+                byjus: ['byjus', 'बायजू', 'बायजू'],
+                unacademy: ['unacademy', 'यूनाकेडमी', 'यूनाकेडमी'],
+                vedantu: ['vedantu', 'वेदांतु', 'वेदांतु'],
+                duolingo: ['duolingo', 'डुओलिंगो', 'डुओलिंगो'],
+                britannica: ['britannica', 'ब्रिटैनिका', 'ब्रिटैनिका'],
+                mit: ['mit', 'एमआईटी', 'एमआईटी'],
+                stanford: ['stanford', 'स्टैनफोर्ड', 'स्टैनफोर्ड'],
+                chess: ['chess', 'शतरंज', 'शतरंज'],
+                ludo: ['ludo', 'लूडो', 'लूडो'],
+                carrom: ['carrom', 'कैरम', 'कैरम'],
+                pubg: ['pubg', 'पबजी', 'पबजी'],
+                freefire: ['free fire', 'freefire', 'फ्री फायर', 'फ्रीफायर'],
+                minecraft: ['minecraft', 'माइनक्राफ्ट', 'माइनक्राफ्ट'],
+                clashofclans: ['clash of clans', 'coc', 'क्लैश ऑफ क्लैंस', 'क्लैश'],
+                valorant: ['valorant', 'वैलोरेंट', 'वैलोरेंट'],
+                fortnite: ['fortnite', 'फोर्टनाइट', 'फोर्टनाइट'],
+                apex: ['apex legends', 'apex', 'एपेक्स लीजेंड्स', 'एपेक्स'],
+                cod: ['call of duty', 'cod', 'कॉल ऑफ ड्यूटी', 'कॉल ऑफ ड्यूटी'],
+                gta: ['gta', 'grand theft auto', 'जीटीए', 'ग्रैंड थेफ्ट ऑटो'],
+                roblox: ['roblox', 'रोब्लॉक्स', 'रोब्लॉक्स'],
+                amongus: ['among us', 'अमंग अस', 'अमंग अस'],
+                candycrush: ['candy crush', 'कैंडी क्रश', 'कैंडी क्रश'],
+                temple: ['temple run', 'टेंपल रन', 'टेंपल रन'],
+                duckduckgo: ['duckduckgo', 'duck duck go', 'डकडकगो', 'डक डक गो'],
+                medium: ['medium', 'मीडियम', 'मीडियम'],
+                quora: ['quora', 'कोरा', 'कोरा'],
+                canva: ['canva', 'कैनवा', 'कैनवा'],
+                figma: ['figma', 'फिग्मा', 'फिग्मा'],
+                notion: ['notion', 'नोशन', 'नोशन'],
+                slack: ['slack', 'स्लैक', 'स्लैक'],
+                zoom: ['zoom', 'ज़ूम', 'ज़ूम'],
+                teams: ['microsoft teams', 'teams', 'माइक्रोसॉफ्ट टीम्स', 'टीम्स'],
+                trello: ['trello', 'ट्रेलो', 'ट्रेलो'],
+                asana: ['asana', 'असाना', 'असाना'],
+                jira: ['jira', 'जिरा', 'जिरा'],
+                confluence: ['confluence', 'कॉन्फ्लुएंस', 'कॉन्फ्लुएंस'],
+                airtable: ['airtable', 'एयरटेबल', 'एयरटेबल'],
+                webflow: ['webflow', 'वेबफ्लो', 'वेबफ्लो'],
+                wix: ['wix', 'विक्स', 'विक्स'],
+                squarespace: ['squarespace', 'स्क्वेयरस्पेस', 'स्क्वेयरस्पेस'],
+                shopify: ['shopify', 'शॉपिफाई', 'शॉपिफाई'],
+                wordpress: ['wordpress', 'वर्डप्रेस', 'वर्डप्रेस'],
+                godaddy: ['godaddy', 'गोडैडी', 'गोडैडी'],
+                namecheap: ['namecheap', 'नेमचीप', 'नेमचीप']
+            };
+
+            var WEBSITE_MAP = {
+                youtube: 'https://youtube.com',
+                instagram: 'https://instagram.com',
+                facebook: 'https://facebook.com',
+                twitter: 'https://twitter.com',
+                whatsapp: 'https://web.whatsapp.com',
+                telegram: 'https://web.telegram.org',
+                snapchat: 'https://snapchat.com',
+                pinterest: 'https://pinterest.com',
+                tumblr: 'https://tumblr.com',
+                linkedin: 'https://linkedin.com',
+                reddit: 'https://reddit.com',
+                discord: 'https://discord.com',
+                tiktok: 'https://tiktok.com',
+                threads: 'https://threads.net',
+                bluesky: 'https://bsky.app',
+                mastodon: 'https://mastodon.social',
+                google: 'https://google.com',
+                gmail: 'https://gmail.com',
+                maps: 'https://maps.google.com',
+                drive: 'https://drive.google.com',
+                docs: 'https://docs.google.com',
+                sheets: 'https://sheets.google.com',
+                slides: 'https://slides.google.com',
+                translate: 'https://translate.google.com',
+                calendar: 'https://calendar.google.com',
+                photos: 'https://photos.google.com',
+                keep: 'https://keep.google.com',
+                tasks: 'https://tasks.google.com',
+                meet: 'https://meet.google.com',
+                netflix: 'https://netflix.com',
+                spotify: 'https://spotify.com',
+                primevideo: 'https://primevideo.com',
+                hotstar: 'https://hotstar.com',
+                sonyliv: 'https://sonyliv.com',
+                voot: 'https://voot.com',
+                zee5: 'https://zee5.com',
+                mxplayer: 'https://mxplayer.com',
+                jiosaavn: 'https://jiosaavn.com',
+                wynk: 'https://wynk.in',
+                gaana: 'https://gaana.com',
+                hungama: 'https://hungama.com',
+                apple: 'https://music.apple.com',
+                soundcloud: 'https://soundcloud.com',
+                tidal: 'https://tidal.com',
+                amazon: 'https://amazon.in',
+                flipkart: 'https://flipkart.com',
+                myntra: 'https://myntra.com',
+                ajio: 'https://ajio.com',
+                nykaa: 'https://nykaa.com',
+                meesho: 'https://meesho.com',
+                snapdeal: 'https://snapdeal.com',
+                paytm: 'https://paytm.com',
+                phonepe: 'https://phonepe.com',
+                gpay: 'https://pay.google.com',
+                croma: 'https://croma.com',
+                reliance: 'https://reliance.com',
+                tata: 'https://tatacliq.com',
+                shopclues: 'https://shopclues.com',
+                zomato: 'https://zomato.com',
+                swiggy: 'https://swiggy.com',
+                dominos: 'https://dominos.in',
+                pizza: 'https://pizzahut.in',
+                kfc: 'https://kfc.co.in',
+                mcdonalds: 'https://mcdonalds.com',
+                burgerking: 'https://burgerking.in',
+                subway: 'https://subway.com',
+                starbucks: 'https://starbucks.in',
+                uber: 'https://uber.com',
+                ola: 'https://ola.com',
+                timesofindia: 'https://timesofindia.com',
+                hindustantimes: 'https://hindustantimes.com',
+                ndtv: 'https://ndtv.com',
+                bbc: 'https://bbc.com',
+                cnn: 'https://cnn.com',
+                thehindu: 'https://thehindu.com',
+                indianexpress: 'https://indianexpress.com',
+                livemint: 'https://livemint.com',
+                moneycontrol: 'https://moneycontrol.com',
+                bloomberg: 'https://bloomberg.com',
+                reuters: 'https://reuters.com',
+                github: 'https://github.com',
+                stackoverflow: 'https://stackoverflow.com',
+                codepen: 'https://codepen.io',
+                devto: 'https://dev.to',
+                producthunt: 'https://producthunt.com',
+                gitlab: 'https://gitlab.com',
+                bitbucket: 'https://bitbucket.org',
+                docker: 'https://docker.com',
+                kubernetes: 'https://kubernetes.io',
+                aws: 'https://aws.amazon.com',
+                azure: 'https://azure.microsoft.com',
+                googlecloud: 'https://cloud.google.com',
+                chatgpt: 'https://chatgpt.com',
+                bard: 'https://bard.google.com',
+                claude: 'https://claude.ai',
+                perplexity: 'https://perplexity.ai',
+                midjourney: 'https://midjourney.com',
+                dalle: 'https://openai.com/dall-e',
+                stable: 'https://stablediffusionweb.com',
+                huggingface: 'https://huggingface.co',
+                replicate: 'https://replicate.com',
+                wikipedia: 'https://wikipedia.org',
+                khanacademy: 'https://khanacademy.org',
+                coursera: 'https://coursera.org',
+                udemy: 'https://udemy.com',
+                byjus: 'https://byjus.com',
+                unacademy: 'https://unacademy.com',
+                vedantu: 'https://vedantu.com',
+                duolingo: 'https://duolingo.com',
+                britannica: 'https://britannica.com',
+                mit: 'https://mit.edu',
+                stanford: 'https://stanford.edu',
+                chess: 'https://chess.com',
+                ludo: 'https://ludo.king.com',
+                carrom: 'https://carrom.com',
+                pubg: 'https://pubg.com',
+                freefire: 'https://freefire.com',
+                minecraft: 'https://minecraft.net',
+                clashofclans: 'https://clashofclans.com',
+                valorant: 'https://valorant.com',
+                fortnite: 'https://fortnite.com',
+                apex: 'https://apexlegends.com',
+                cod: 'https://callofduty.com',
+                gta: 'https://rockstargames.com',
+                roblox: 'https://roblox.com',
+                amongus: 'https://amongus.com',
+                candycrush: 'https://candycrush.com',
+                temple: 'https://templerun.com',
+                duckduckgo: 'https://duckduckgo.com',
+                medium: 'https://medium.com',
+                quora: 'https://quora.com',
+                canva: 'https://canva.com',
+                figma: 'https://figma.com',
+                notion: 'https://notion.so',
+                slack: 'https://slack.com',
+                zoom: 'https://zoom.us',
+                teams: 'https://teams.microsoft.com',
+                trello: 'https://trello.com',
+                asana: 'https://asana.com',
+                jira: 'https://jira.com',
+                confluence: 'https://atlassian.com/software/confluence',
+                airtable: 'https://airtable.com',
+                webflow: 'https://webflow.com',
+                wix: 'https://wix.com',
+                squarespace: 'https://squarespace.com',
+                shopify: 'https://shopify.com',
+                wordpress: 'https://wordpress.com',
+                godaddy: 'https://godaddy.com',
+                namecheap: 'https://namecheap.com'
+            };
+
+            // ============================================================
+            // LOCAL KNOWLEDGE BASE
+            // ============================================================
+            function getLocalAnswer(query) {
+                var q = query.toLowerCase().trim();
+
+                if (q.includes('tumhe kisne banaya') || q.includes('tum kisne banaya') ||
+                    q.includes('tumhari creator') || q.includes('tumhara maker') ||
+                    q.includes('who created you') || q.includes('who made you')) {
+                    return "मुझे Zishan ने बनाया है। Zishan ek talented developer hain aur unka vision hai ki AI ko sabke liye accessible banana.";
+                }
+
+                if ((q.includes('zishan') && (q.includes('kaun') || q.includes('who') ||
+                        q.includes('के बारे') || q.includes('about') || q.includes('कौन'))) ||
+                    q.includes('zishan kaun hai')) {
+                    return "Zishan StardustOfficial ke founder hain. Wo ek passionate developer hain jo AI aur technology mein deep interest rakhte hain. Unka maqsad hai ki AI ko simple aur useful banana.";
+                }
+
+                if (q.includes('stardustofficial') || q.includes('stardust official') ||
+                    q.includes('स्टारडस्ट') || (q.includes('stardust') && q.includes('about'))) {
+                    return "StardustOfficial ek innovative tech company hai jo AI solutions, web development, aur digital products mein specialize karti hai. Company ka mission hai ki technology ko accessible aur impactful banana. Zishan is company ke founder aur CEO hain.";
+                }
+
+                if (q.includes('date') || q.includes('today') || q.includes('aaj') ||
+                    q.includes('तारीख') || q.includes('date kya hai') || q.includes('aaj ka')) {
+                    var now = new Date();
+                    var options = { year: 'numeric', month: 'long', day: 'numeric' };
+                    return 'Aaj ki tareekh ' + now.toLocaleDateString('hi-IN', options) + ' hai.';
+                }
+
+                if (q.includes('time') || q.includes('samay') || q.includes('समय') ||
+                    q.includes('kya time') || q.includes('time kya hai')) {
+                    var now = new Date();
+                    var hours = String(now.getHours()).padStart(2, '0');
+                    var minutes = String(now.getMinutes()).padStart(2, '0');
+                    return 'Abhi ' + hours + ':' + minutes + ' baj rahe hain.';
+                }
+
+                if (q.includes('tum kaun ho') || q.includes('who are you') || q.includes('तुम कौन हो') ||
+                    q.includes('tum kya ho') || q.includes('what are you')) {
+                    return "Main Zishu AI hoon - ek voice assistant jo Zishan ne banaya hai. Main StardustOfficial ka AI project hoon. Main Hindi aur English dono mein baat kar sakta hoon aur 200+ websites bhi open kar sakta hoon!";
+                }
+
+                return null;
+            }
+
+            // ============================================================
+            // LOCAL COMMAND DETECTION
+            // ============================================================
+            function detectLocalCommand(query) {
+                var q = query.toLowerCase().trim();
+                var openWords = [
+                    'open', 'open karo', 'open kar', 'kholo', 'khol', 'khol do', 'khol de',
+                    'chalao', 'chala do', 'start', 'launch',
+                    'खोलो', 'खोल', 'खोल दो', 'खोल दे', 'खोलना', 'चलाओ', 'चला दो',
+                    'शुरू करो', 'शुरू कर', 'op', 'opn', 'ओपन', 'ओपन करो', 'ओपन कर'
+                ];
+
+                for (var site in SITE_ALIASES) {
+                    if (SITE_ALIASES.hasOwnProperty(site)) {
+                        var aliases = SITE_ALIASES[site];
+                        var siteFound = aliases.some(function(alias) { return q.includes(alias); });
+                        if (!siteFound) continue;
+
+                        var wantsOpen = openWords.some(function(word) { return q.includes(word); }) ||
+                            aliases.some(function(alias) { return q === alias; }) ||
+                            q === site ||
+                            q === 'open ' + site ||
+                            q === 'ओपन ' + site;
+
+                        if (wantsOpen) {
+                            return {
+                                type: 'open_website',
+                                value: site
+                            };
+                        }
+                    }
+                }
+                return null;
+            }
+
+            function openWebsiteDirectly(siteName) {
+                var url = WEBSITE_MAP[siteName];
+                if (!url) {
+                    addToolMessage('Website not found: ' + siteName);
+                    return false;
+                }
+
+                addToolMessage('Opening ' + siteName + '...');
+                try {
+                    window.location.assign(url);
+                    return true;
+                } catch (error) {
+                    try {
+                        window.location.href = url;
+                        return true;
+                    } catch (error2) {
+                        try {
+                            var a = document.createElement('a');
+                            a.href = url;
+                            a.target = '_blank';
+                            a.rel = 'noopener noreferrer';
+                            document.body.appendChild(a);
+                            a.click();
+                            a.remove();
+                            return true;
+                        } catch (error3) {
+                            addToolMessage('Could not open ' + siteName);
+                            return false;
+                        }
+                    }
+                }
+            }
+
+            // ============================================================
+            // ORB CONTROLS
+            // ============================================================
+            function setOrbState(newState) {
+                state = newState;
+                orbWrapper.className = newState;
+
+                var statusMap = {
+                    idle: ['Zishu is ready', 'Say "Zishu" to start'],
+                    listening: ['Listening...', 'Speak now'],
+                    thinking: ['Thinking...', 'Processing your request'],
+                    speaking: ['Speaking...', 'Tap orb to stop']
+                };
+                var statuses = statusMap[newState] || statusMap.idle;
+                orbStatus.textContent = statuses[0];
+                orbSub.textContent = statuses[1];
+            }
+
+            // Orb click handler
+            orbWrapper.addEventListener('click', function(e) {
+                e.stopPropagation();
+                e.preventDefault();
+
+                if (isSpeakingNow || state === STATE.SPEAKING || isProcessing) {
+                    stopCurrentResponse();
+                    return;
+                }
+
+                toggleListening();
+            });
+
+            function toggleListening() {
+                if (isProcessing) {
+                    orbSub.textContent = 'Please wait...';
+                    return;
+                }
+
+                if (state === STATE.IDLE || state === STATE.SPEAKING) {
+                    startListening();
+                } else if (state === STATE.LISTENING) {
+                    stopListening();
+                    setOrbState(STATE.IDLE);
+                }
+            }
+
+            // ============================================================
+            // STOP RESPONSE FUNCTION
+            // ============================================================
+            function stopCurrentResponse() {
+                isStopped = true;
+                isSpeakingNow = false;
+
+                try {
+                    if (window.speechSynthesis) {
+                        window.speechSynthesis.cancel();
+                    }
+                    if (currentUtterance) {
+                        currentUtterance = null;
+                    }
+                } catch (e) {}
+
+                if (utteranceResolve) {
+                    utteranceResolve();
+                    utteranceResolve = null;
+                }
+
+                isProcessing = false;
+                currentResponseText = '';
+
+                var stopDiv = document.createElement('div');
+                stopDiv.className = 'zishu-stop-msg';
+                stopDiv.textContent = '⏹️ बोलना रोका गया! फिर से सुन रहा हूँ...';
+                chatContainer.appendChild(stopDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+
+                setOrbState(STATE.IDLE);
+
+                setTimeout(function() {
+                    isStopped = false;
+                    if (state === STATE.IDLE) {
+                        startListening();
+                    }
+                }, 400);
+            }
+
+            function isStopCommand(query) {
+                var q = query.toLowerCase().trim();
+                return STOP_WORDS.some(function(word) {
+                    if (q === word) return true;
+                    if (q.includes(word)) return true;
+                    if (word.includes(q) && q.length > 2) return true;
+                    return false;
+                });
+            }
+
+            // ============================================================
+            // SPEECH RECOGNITION
+            // ============================================================
+            function initSpeechRecognition() {
+                var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+                if (!SR) {
+                    orbStatus.textContent = 'Browser not supported';
+                    return null;
+                }
+
+                var rec = new SR();
+                rec.lang = 'hi-IN';
+                rec.continuous = false;
+                rec.interimResults = false;
+                rec.maxAlternatives = 1;
+
+                rec.onstart = function() {
+                    clearRestartTimer();
+                    setOrbState(STATE.LISTENING);
+                    if (isFirstActivation) {
+                        isFirstActivation = false;
+                        orbSub.textContent = 'Listening...';
+                    }
+                };
+
+                rec.onresult = function(event) {
+                    var transcript = event.results[0][0].transcript.trim();
+                    if (transcript.length > 0) {
+                        if (isWakeWord(transcript) && state === STATE.IDLE) {
+                            if (!isProcessing) {
+                                stopListening();
+                                setTimeout(function() {
+                                    startListening();
+                                }, 200);
+                                addToolMessage('🔊 "Zishu" sun liya! Ab bolen...');
+                                return;
+                            }
+                        }
+
+                        if (isStopCommand(transcript)) {
+                            if (isSpeakingNow || isProcessing || state === STATE.SPEAKING) {
+                                stopCurrentResponse();
+                                return;
+                            }
+                        }
+
+                        stopListening();
+                        handleUserQuery(transcript);
+                    }
+                };
+
+                rec.onerror = function(event) {
+                    if (event.error === 'not-allowed') {
+                        orbStatus.textContent = 'Microphone access denied';
+                        orbSub.textContent = 'Please allow microphone access';
+                        setOrbState(STATE.IDLE);
+                    } else if (event.error === 'no-speech') {
+                        orbSub.textContent = 'No speech detected. Try again.';
+                        scheduleRestart(800);
+                    } else {
+                        orbSub.textContent = 'Error: ' + event.error;
+                        scheduleRestart(1000);
+                    }
+                };
+
+                rec.onend = function() {
+                    if (state === STATE.LISTENING && !isProcessing && !isRestartScheduled) {
+                        scheduleRestart(300);
+                    } else if (!isProcessing && state !== STATE.SPEAKING) {
+                        setOrbState(STATE.IDLE);
+                    }
+                };
+
+                return rec;
+            }
+
+            // ============================================================
+            // LISTENING FUNCTIONS
+            // ============================================================
+            function startListening() {
+                clearRestartTimer();
+                if (!recognition) {
+                    recognition = initSpeechRecognition();
+                    if (!recognition) return;
+                }
+                try {
+                    recognition.start();
+                    setOrbState(STATE.LISTENING);
+                } catch (e) {
+                    setOrbState(STATE.IDLE);
+                }
+            }
+
+            function stopListening() {
+                clearRestartTimer();
+                if (recognition) {
+                    try { recognition.stop(); } catch (e) {}
+                }
+                if (!isProcessing) {
+                    setOrbState(STATE.IDLE);
+                }
+            }
+
+            function scheduleRestart(delay) {
+                clearRestartTimer();
+                isRestartScheduled = true;
+                restartTimer = setTimeout(function() {
+                    isRestartScheduled = false;
+                    if (state === STATE.IDLE || state === STATE.LISTENING) {
+                        startListening();
+                    }
+                }, delay);
+            }
+
+            function clearRestartTimer() {
+                isRestartScheduled = false;
+                if (restartTimer) {
+                    clearTimeout(restartTimer);
+                    restartTimer = null;
+                }
+            }
+
+            // ============================================================
+            // UI HELPERS
+            // ============================================================
+            function addToolMessage(text) {
+                var div = document.createElement('div');
+                div.className = 'zishu-tool-msg';
+                div.textContent = text;
+                chatContainer.appendChild(div);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+
+            function addActionMessage(text) {
+                var div = document.createElement('div');
+                div.className = 'zishu-action-msg';
+                div.textContent = text;
+                chatContainer.appendChild(div);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+
+            // ============================================================
+            // FIXED TTS
+            // ============================================================
+            function speakText(text) {
+                var cleanText = cleanTextForSpeech(text);
+
+                if (isStopped) {
+                    return Promise.resolve();
+                }
+
+                if (!cleanText || cleanText.trim().length === 0) {
+                    if (!isProcessing) {
+                        setOrbState(STATE.IDLE);
+                        scheduleRestart(1000);
+                    }
+                    return Promise.resolve();
+                }
+
+                return new Promise(function(resolve) {
+                    try {
+                        if (!window.speechSynthesis) {
+                            resolve();
+                            return;
+                        }
+
+                        try {
+                            window.speechSynthesis.cancel();
+                        } catch (e) {}
+
+                        var voices = window.speechSynthesis.getVoices();
+                        if (voices.length === 0) {
+                            var voiceTimeout = setTimeout(function() {
+                                if (!isStopped) {
+                                    proceedWithSpeech();
+                                } else {
+                                    resolve();
+                                }
+                            }, 2000);
+
+                            window.speechSynthesis.onvoiceschanged = function() {
+                                clearTimeout(voiceTimeout);
+                                if (!isStopped) {
+                                    proceedWithSpeech();
+                                } else {
+                                    resolve();
+                                }
+                            };
+                            return;
+                        }
+
+                        proceedWithSpeech();
+
+                        function proceedWithSpeech() {
+                            if (isStopped) {
+                                resolve();
+                                return;
+                            }
+
+                            var utterance = new SpeechSynthesisUtterance(cleanText);
+                            utterance.lang = 'hi-IN';
+                            utterance.rate = 0.95;
+                            utterance.pitch = 1.05;
+                            utterance.volume = 1;
+
+                            try {
+                                var voices = window.speechSynthesis.getVoices();
+                                var femaleHindi = voices.filter(function(v) {
+                                    return v.lang.startsWith('hi') &&
+                                        (v.name.toLowerCase().includes('female') ||
+                                            v.name.toLowerCase().includes('swara') ||
+                                            v.name.toLowerCase().includes('lekh') ||
+                                            v.name.toLowerCase().includes('google'));
+                                });
+
+                                if (femaleHindi.length > 0) {
+                                    utterance.voice = femaleHindi[0];
+                                } else {
+                                    var anyHindi = voices.find(function(v) { return v.lang.startsWith('hi'); });
+                                    if (anyHindi) {
+                                        utterance.voice = anyHindi;
+                                    }
+                                }
+                            } catch (e) {}
+
+                            var isEnded = false;
+                            var safetyTimer = null;
+
+                            utterance.onstart = function() {
+                                isSpeakingNow = true;
+                                if (!isStopped) {
+                                    setOrbState(STATE.SPEAKING);
+                                }
+
+                                safetyTimer = setTimeout(function() {
+                                    if (!isEnded && !isStopped) {
+                                        // safety timeout
+                                    }
+                                }, Math.max(cleanText.length * 40 + 5000, 8000));
+                            };
+
+                            utterance.onend = function() {
+                                if (!isEnded) {
+                                    isEnded = true;
+                                    isSpeakingNow = false;
+                                    currentUtterance = null;
+                                    if (safetyTimer) {
+                                        clearTimeout(safetyTimer);
+                                        safetyTimer = null;
+                                    }
+                                    if (!isStopped && !isProcessing) {
+                                        setOrbState(STATE.IDLE);
+                                        scheduleRestart(1000);
+                                    }
+                                    resolve();
+                                }
+                            };
+
+                            utterance.onerror = function() {
+                                if (!isEnded) {
+                                    isEnded = true;
+                                    isSpeakingNow = false;
+                                    currentUtterance = null;
+                                    if (safetyTimer) {
+                                        clearTimeout(safetyTimer);
+                                        safetyTimer = null;
+                                    }
+                                    if (!isStopped && !isProcessing) {
+                                        setOrbState(STATE.IDLE);
+                                        scheduleRestart(1000);
+                                    }
+                                    resolve();
+                                }
+                            };
+
+                            currentUtterance = utterance;
+                            utteranceResolve = resolve;
+
+                            try {
+                                window.speechSynthesis.speak(utterance);
+                            } catch (e) {
+                                isSpeakingNow = false;
+                                if (!isStopped && !isProcessing) {
+                                    setOrbState(STATE.IDLE);
+                                    scheduleRestart(1000);
+                                }
+                                resolve();
+                            }
+                        }
+
+                    } catch (error) {
+                        isSpeakingNow = false;
+                        if (!isStopped && !isProcessing) {
+                            setOrbState(STATE.IDLE);
+                            scheduleRestart(1000);
+                        }
+                        resolve();
+                    }
+                });
+            }
+
+            // ============================================================
+            // FORCE VOICE LOADING
+            // ============================================================
+            function forceLoadVoices() {
+                if (!window.speechSynthesis) return;
+
+                try {
+                    var attempts = 0;
+                    var maxAttempts = 5;
+
+                    function tryLoadVoices() {
+                        attempts++;
+                        var voices = window.speechSynthesis.getVoices();
+                        if (voices.length > 0) {
+                            return true;
+                        }
+                        if (attempts < maxAttempts) {
+                            setTimeout(tryLoadVoices, 500 * attempts);
+                        }
+                        return false;
+                    }
+
+                    tryLoadVoices();
+
+                    window.speechSynthesis.onvoiceschanged = function() {
+                        var voices = window.speechSynthesis.getVoices();
+                    };
+
+                } catch (e) {}
+            }
+
+            // ============================================================
+            // STREAMING RESPONSE
+            // ============================================================
+            function streamResponse(text) {
+                currentResponseText = text;
+
+                if (isStopped) {
+                    return null;
+                }
+
+                setOrbState(STATE.SPEAKING);
+
+                var msgDiv = document.createElement('div');
+                msgDiv.className = 'zishu-message zishu-assistant-msg';
+                var senderSpan = document.createElement('span');
+                senderSpan.className = 'zishu-sender';
+                senderSpan.textContent = 'Zishu';
+                var contentSpan = document.createElement('span');
+                contentSpan.className = 'zishu-content';
+                msgDiv.appendChild(senderSpan);
+                msgDiv.appendChild(contentSpan);
+                chatContainer.appendChild(msgDiv);
+
+                var accumulatedText = '';
+                var chunkSize = 3;
+                var index = 0;
+
+                function streamNextChunk() {
+                    if (isStopped) {
+                        contentSpan.textContent = accumulatedText + '... [stopped]';
+                        return;
+                    }
+
+                    if (index >= text.length) {
+                        if (!isStopped) {
+                            setTimeout(function() {
+                                if (!isStopped) {
+                                    speakText(text);
+                                }
+                            }, 300);
+                        }
+                        return;
+                    }
+
+                    var chunk = text.substring(index, Math.min(index + chunkSize, text.length));
+                    accumulatedText += chunk;
+                    contentSpan.textContent = accumulatedText;
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+
+                    index += chunkSize;
+
+                    requestAnimationFrame(function() {
+                        setTimeout(streamNextChunk, 15);
+                    });
+                }
+
+                streamNextChunk();
+
+                return msgDiv;
+            }
+
+            // ============================================================
+            // MAIN QUERY HANDLER
+            // ============================================================
+            function handleUserQuery(query) {
+                if (isProcessing) return;
+                isProcessing = true;
+                isStopped = false;
+                isSpeakingNow = false;
+                clearRestartTimer();
+                setOrbState(STATE.THINKING);
+
+                var userDiv = document.createElement('div');
+                userDiv.className = 'zishu-message zishu-user-msg';
+                var senderSpan = document.createElement('span');
+                senderSpan.className = 'zishu-sender';
+                senderSpan.textContent = 'You';
+                var contentSpan = document.createElement('span');
+                contentSpan.className = 'zishu-content';
+                contentSpan.textContent = query;
+                userDiv.appendChild(senderSpan);
+                userDiv.appendChild(contentSpan);
+                chatContainer.appendChild(userDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+
+                // Check for Actions
+                var actionResult = handleActions(query);
+                if (actionResult) {
+                    addActionMessage(actionResult);
+                    speakText(actionResult).then(function() {
+                        isProcessing = false;
+                        if (!isStopped) {
+                            setOrbState(STATE.IDLE);
+                            scheduleRestart(1000);
+                        }
+                    });
+                    return;
+                }
+
+                var localAnswer = getLocalAnswer(query);
+                if (localAnswer) {
+                    streamResponse(localAnswer);
+                    isProcessing = false;
+                    if (!isStopped) {
+                        setOrbState(STATE.IDLE);
+                        scheduleRestart(1000);
+                    }
+                    return;
+                }
+
+                var localCommand = detectLocalCommand(query);
+                if (localCommand && localCommand.type === 'open_website') {
+                    openWebsiteDirectly(localCommand.value);
+                    isProcessing = false;
+                    setOrbState(STATE.IDLE);
+                    scheduleRestart(1200);
+                    return;
+                }
+
+                try {
+                    var timestampedQuery = query + ' (Current date: ' + new Date().toISOString().split('T')[0] + ')';
+
+                    fetch(BACKEND_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            query: timestampedQuery,
+                            history: conversationHistory
+                        })
+                    })
+                    .then(function(response) {
+                        if (!response.ok) {
+                            throw new Error('Server error: ' + response.status);
+                        }
+                        return response.json();
+                    })
+                    .then(function(data) {
+                        conversationHistory = data.history || [];
+                        if (isStopped) {
+                            isProcessing = false;
+                            return;
+                        }
+                        streamResponse(data.response);
+                        isProcessing = false;
+                        if (!isStopped && state !== STATE.LISTENING && !isSpeakingNow) {
+                            setTimeout(function() {
+                                if (state !== STATE.SPEAKING && !isStopped && !isSpeakingNow) {
+                                    setOrbState(STATE.IDLE);
+                                    scheduleRestart(1000);
+                                }
+                            }, 500);
+                        }
+                    })
+                    .catch(function(error) {
+                        addToolMessage('Error: ' + error.message);
+                        setOrbState(STATE.IDLE);
+                        isProcessing = false;
+                    });
+
+                } catch (error) {
+                    addToolMessage('Error: ' + error.message);
+                    setOrbState(STATE.IDLE);
+                    isProcessing = false;
+                }
+            }
+
+            // ============================================================
+            // KEYBOARD SHORTCUT - Space to toggle/stop
+            // ============================================================
+            document.addEventListener('keydown', function(e) {
+                if (e.code === 'Space' && !e.repeat && !e.target.matches('input, textarea, button, a')) {
+                    e.preventDefault();
+                    if (isSpeakingNow || state === STATE.SPEAKING || isProcessing) {
+                        stopCurrentResponse();
+                    } else {
+                        toggleListening();
+                    }
+                }
+            });
+
+            // ============================================================
+            // INIT
+            // ============================================================
+            setTimeout(forceLoadVoices, 100);
+            setTimeout(forceLoadVoices, 500);
+            setTimeout(forceLoadVoices, 1000);
+
+            setOrbState(STATE.IDLE);
+
+            // Check for existing alarms on load
+            setTimeout(checkAlarms, 1000);
+
+            // Welcome message
+            var welcomeDiv = document.createElement('div');
+            welcomeDiv.className = 'zishu-message zishu-assistant-msg';
+            var ws = document.createElement('span');
+            ws.className = 'zishu-sender';
+            ws.textContent = 'Zishu';
+            var wc = document.createElement('span');
+            wc.className = 'zishu-content';
+            wc.textContent = 'Namaste! Main Zishu hoon. "Zishu" bole ya orb tap karein. Main alarm, reminder, notes save kar sakta hoon! 200+ websites bhi open kar sakta hoon.';
+            welcomeDiv.appendChild(ws);
+            welcomeDiv.appendChild(wc);
+            chatContainer.appendChild(welcomeDiv);
+
+            // Sync dark mode with assistant
+            var currentTheme = document.documentElement.getAttribute('data-theme');
+            if (currentTheme === 'dark') {
+                assistantRoot.classList.add('dark-mode');
+            }
+
+            // Theme toggle sync from marketing
+            var themeToggleBtn = document.getElementById('themeToggle');
+            if (themeToggleBtn) {
+                var origToggle = themeToggleBtn.click;
+                themeToggleBtn.addEventListener('click', function() {
+                    var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                    if (isDark) {
+                        assistantRoot.classList.add('dark-mode');
+                    } else {
+                        assistantRoot.classList.remove('dark-mode');
+                    }
+                });
+            }
+
+            console.log('🚀 Zishu AI v2.8 — Merged');
+            console.log('✅ Voice assistant preserved');
+            console.log('✅ Marketing website integrated');
+        })();
+    </script>
+</body>
+</html>
