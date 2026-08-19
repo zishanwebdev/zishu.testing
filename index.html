@@ -424,14 +424,15 @@
             margin-top: 0.1rem;
         }
 
+        /* CREDIT DISPLAY - Left side below banner */
         .credit-display {
             position: absolute;
             left: 0;
-            bottom: 0;
+            bottom: -1.8rem;
             font-size: 0.8rem;
             color: var(--credit-text);
             background: var(--credit-bg);
-            padding: 0.2rem 0.8rem;
+            padding: 0.25rem 0.9rem;
             border-radius: 30px;
             font-weight: 500;
             letter-spacing: 0.2px;
@@ -440,7 +441,17 @@
             backdrop-filter: blur(4px);
         }
         .credit-display.visible {
-            display: block;
+            display: inline-block;
+        }
+        .credit-display.limit-reached {
+            color: #dc3545;
+            background: rgba(220, 53, 69, 0.1);
+            border-color: rgba(220, 53, 69, 0.2);
+        }
+        [data-theme="dark"] .credit-display.limit-reached {
+            color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+            border-color: rgba(255, 107, 107, 0.2);
         }
 
         /* ============================================================
@@ -454,7 +465,7 @@
             padding: 20px 28px 18px;
             transition: background 0.4s ease, color 0.4s ease;
             user-select: none;
-            margin-top: 0.5rem;
+            margin-top: 1.5rem;
             border: 1px solid var(--zishu-border);
         }
         .zishu-assistant.dark-mode {
@@ -1931,7 +1942,7 @@
                 left: auto;
                 bottom: auto;
                 display: inline-block;
-                margin-top: 0.2rem;
+                margin-top: 0.3rem;
                 font-size: 0.7rem;
                 padding: 0.15rem 0.6rem;
             }
@@ -2106,7 +2117,7 @@
                 padding: 0.8rem 1.5rem;
             }
             .credit-display {
-                font-size: 0.65rem;
+                font-size: 0.6rem;
                 padding: 0.1rem 0.5rem;
             }
             .credit-info-box {
@@ -2194,7 +2205,7 @@
                 <div class="assistant-header">
                     <h1>ZISH<span>U</span></h1>
                     <p id="assistant-tagline">Your personal AI assistant</p>
-                    <div class="credit-display" id="creditDisplay"></div>
+                    <div class="credit-display" id="creditDisplay">Credit: 0/0</div>
                 </div>
 
                 <!-- ZISHU ASSISTANT -->
@@ -2245,7 +2256,7 @@
 
                     <div id="zishu-footer">
                         <span id="footer-private">private · local</span>
-                        <span>v2.8</span>
+                        <span>v3.0</span>
                     </div>
                 </div>
                 <!-- END ZISHU ASSISTANT -->
@@ -2325,7 +2336,7 @@
             <div class="explore-section" id="faq-section">
                 <h2 class="section-title" id="faq-title">FAQ</h2>
                 <div id="faqContainer">
-                    <!-- FAQ items will be rendered by JS -->
+                    <!-- FAQ items rendered by JS -->
                 </div>
             </div>
         </div>
@@ -2547,9 +2558,9 @@
     ============================================================ -->
     <script>
         // ============================================================
-        // BACKEND URL
+        // BACKEND URL - CHANGE THIS TO YOUR DEPLOYED BACKEND
         // ============================================================
-        const BACKEND_URL = 'https://zishu-backend.onrender.com'; // Change to your backend URL
+        const BACKEND_URL = 'https://zishu-backend.onrender.com/api/chat';
 
         // ============================================================
         // LANGUAGE MANAGEMENT
@@ -2883,9 +2894,9 @@
 
 
         // ============================================================
-        // CREDIT DISPLAY
+        // CREDIT DISPLAY - FIXED
         // ============================================================
-        let lastCreditInfo = null;
+        let cachedCredits = null;
 
         async function fetchCreditInfo() {
             try {
@@ -2897,7 +2908,7 @@
                 });
                 if (!response.ok) return null;
                 const data = await response.json();
-                lastCreditInfo = data.credits;
+                cachedCredits = data.credits;
                 return data.credits;
             } catch (e) {
                 console.warn('Could not fetch credits:', e);
@@ -2908,26 +2919,28 @@
         async function updateCreditDisplay() {
             const display = document.getElementById('creditDisplay');
             if (!display) return;
-            
+
             const credits = await fetchCreditInfo();
             if (!credits) {
-                display.classList.remove('visible');
+                display.textContent = 'Credit: --/--';
+                display.classList.add('visible');
                 return;
             }
-            
+
             const remaining = credits.remaining;
             const max = credits.max;
-            
+
             if (remaining <= 0) {
-                display.textContent = 'Daily limit reached';
-                display.style.color = 'var(--zishu-stop-bg)';
-                display.style.background = 'rgba(248, 215, 218, 0.3)';
+                display.textContent = 'Credit: 0/' + max + ' (Limit Reached)';
+                display.classList.add('limit-reached');
+                display.classList.remove('visible');
+                display.classList.add('visible');
             } else {
                 display.textContent = 'Credit: ' + remaining + '/' + max;
-                display.style.color = '';
-                display.style.background = '';
+                display.classList.remove('limit-reached');
+                display.classList.remove('visible');
+                display.classList.add('visible');
             }
-            display.classList.add('visible');
         }
 
 
@@ -3004,7 +3017,7 @@
                 window.scrollTo({ top: 0, behavior: 'smooth' });
 
                 if (page === 'home') {
-                    updateCreditDisplay();
+                    setTimeout(updateCreditDisplay, 300);
                 }
             }
 
@@ -3053,6 +3066,7 @@
             const guestContinue = document.getElementById('guestContinueBtn');
 
             function openModal() { modal.classList.add('open'); }
+
             function closeModal() { modal.classList.remove('open'); }
 
             modalClose.addEventListener('click', closeModal);
@@ -3152,7 +3166,6 @@
             auth.onAuthStateChanged(function(user) {
                 currentUser = user;
                 updateUIForAuth(user);
-                // Update credits after auth change
                 setTimeout(updateCreditDisplay, 500);
                 if (user) {
                     const modal = document.getElementById('loginModal');
@@ -3230,7 +3243,7 @@
 
 
         // ============================================================
-        // ZISHU ASSISTANT — WITH BACKEND CREDIT INTEGRATION
+        // ZISHU ASSISTANT — WITH FIXED CREDIT CHECK
         // ============================================================
         (function zishuAssistant() {
             const STATE = {
@@ -3811,15 +3824,29 @@
                 div.textContent = text;
                 chatContainer.appendChild(div);
                 chatContainer.scrollTop = chatContainer.scrollHeight;
+                // Update credit display after showing limit
+                setTimeout(updateCreditDisplay, 300);
             }
 
+            // ============================================================
+            // CHECK CREDITS BEFORE ORB CLICK
+            // ============================================================
             orbWrapper.addEventListener('click', function(e) {
                 e.stopPropagation();
                 e.preventDefault();
+
                 if (isSpeakingNow || state === STATE.SPEAKING || isProcessing) {
                     stopCurrentResponse();
                     return;
                 }
+
+                // Check credits first
+                if (cachedCredits && cachedCredits.remaining <= 0) {
+                    addLimitMessage('Daily usage limit reached. Please try again tomorrow.');
+                    updateCreditDisplay();
+                    return;
+                }
+
                 toggleListening();
             });
 
@@ -3829,6 +3856,11 @@
                     return;
                 }
                 if (state === STATE.IDLE || state === STATE.SPEAKING) {
+                    // Check credits before starting listening
+                    if (cachedCredits && cachedCredits.remaining <= 0) {
+                        addLimitMessage('Daily usage limit reached. Please try again tomorrow.');
+                        return;
+                    }
                     startListening();
                 } else if (state === STATE.LISTENING) {
                     stopListening();
@@ -3860,8 +3892,10 @@
                 setOrbState(STATE.IDLE);
                 setTimeout(function() {
                     isStopped = false;
-                    if (state === STATE.IDLE) {
+                    if (state === STATE.IDLE && cachedCredits && cachedCredits.remaining > 0) {
                         startListening();
+                    } else if (state === STATE.IDLE && cachedCredits && cachedCredits.remaining <= 0) {
+                        addLimitMessage('Daily usage limit reached.');
                     }
                 }, 400);
             }
@@ -3901,10 +3935,19 @@
                     var transcript = event.results[0][0].transcript.trim();
                     if (transcript.length > 0) {
                         if (isWakeWord(transcript) && state === STATE.IDLE) {
-                            if (!isProcessing) {
+                            if (!isProcessing && cachedCredits && cachedCredits.remaining > 0) {
                                 stopListening();
-                                setTimeout(function() { startListening(); }, 200);
+                                setTimeout(function() {
+                                    if (cachedCredits && cachedCredits.remaining > 0) {
+                                        startListening();
+                                    } else {
+                                        addLimitMessage('Daily usage limit reached.');
+                                    }
+                                }, 200);
                                 addToolMessage('"Zishu" sun liya! Ab bolen...');
+                                return;
+                            } else if (cachedCredits && cachedCredits.remaining <= 0) {
+                                addLimitMessage('Daily usage limit reached.');
                                 return;
                             }
                         }
@@ -3945,6 +3988,10 @@
 
             function startListening() {
                 clearRestartTimer();
+                if (cachedCredits && cachedCredits.remaining <= 0) {
+                    addLimitMessage('Daily usage limit reached.');
+                    return;
+                }
                 if (!recognition) {
                     recognition = initSpeechRecognition();
                     if (!recognition) return;
@@ -3972,8 +4019,11 @@
                 isRestartScheduled = true;
                 restartTimer = setTimeout(function() {
                     isRestartScheduled = false;
-                    if (state === STATE.IDLE || state === STATE.LISTENING) {
+                    if ((state === STATE.IDLE || state === STATE.LISTENING) && cachedCredits && cachedCredits.remaining > 0) {
                         startListening();
+                    } else if (cachedCredits && cachedCredits.remaining <= 0) {
+                        addLimitMessage('Daily usage limit reached.');
+                        setOrbState(STATE.IDLE);
                     }
                 }, delay);
             }
@@ -4008,7 +4058,9 @@
                 if (!cleanText || cleanText.trim().length === 0) {
                     if (!isProcessing) {
                         setOrbState(STATE.IDLE);
-                        scheduleRestart(1000);
+                        if (cachedCredits && cachedCredits.remaining > 0) {
+                            scheduleRestart(1000);
+                        }
                     }
                     return Promise.resolve();
                 }
@@ -4072,7 +4124,9 @@
                                         safetyTimer = null; }
                                     if (!isStopped && !isProcessing) {
                                         setOrbState(STATE.IDLE);
-                                        scheduleRestart(1000);
+                                        if (cachedCredits && cachedCredits.remaining > 0) {
+                                            scheduleRestart(1000);
+                                        }
                                     }
                                     resolve();
                                 }
@@ -4086,7 +4140,9 @@
                                         safetyTimer = null; }
                                     if (!isStopped && !isProcessing) {
                                         setOrbState(STATE.IDLE);
-                                        scheduleRestart(1000);
+                                        if (cachedCredits && cachedCredits.remaining > 0) {
+                                            scheduleRestart(1000);
+                                        }
                                     }
                                     resolve();
                                 }
@@ -4099,7 +4155,9 @@
                                 isSpeakingNow = false;
                                 if (!isStopped && !isProcessing) {
                                     setOrbState(STATE.IDLE);
-                                    scheduleRestart(1000);
+                                    if (cachedCredits && cachedCredits.remaining > 0) {
+                                        scheduleRestart(1000);
+                                    }
                                 }
                                 resolve();
                             }
@@ -4108,7 +4166,9 @@
                         isSpeakingNow = false;
                         if (!isStopped && !isProcessing) {
                             setOrbState(STATE.IDLE);
-                            scheduleRestart(1000);
+                            if (cachedCredits && cachedCredits.remaining > 0) {
+                                scheduleRestart(1000);
+                            }
                         }
                         resolve();
                     }
@@ -4181,10 +4241,18 @@
             }
 
             // ============================================================
-            // MAIN HANDLE USER QUERY — WITH BACKEND CREDIT INTEGRATION
+            // MAIN HANDLE USER QUERY — WITH CREDIT CHECK
             // ============================================================
             function handleUserQuery(query) {
                 if (isProcessing) return;
+
+                // Check credits before processing
+                if (cachedCredits && cachedCredits.remaining <= 0) {
+                    addLimitMessage('Daily usage limit reached. Please try again tomorrow.');
+                    updateCreditDisplay();
+                    return;
+                }
+
                 isProcessing = true;
                 isStopped = false;
                 isSpeakingNow = false;
@@ -4212,7 +4280,9 @@
                         isProcessing = false;
                         if (!isStopped) {
                             setOrbState(STATE.IDLE);
-                            scheduleRestart(1000);
+                            if (cachedCredits && cachedCredits.remaining > 0) {
+                                scheduleRestart(1000);
+                            }
                         }
                     });
                     return;
@@ -4224,7 +4294,9 @@
                     isProcessing = false;
                     if (!isStopped) {
                         setOrbState(STATE.IDLE);
-                        scheduleRestart(1000);
+                        if (cachedCredits && cachedCredits.remaining > 0) {
+                            scheduleRestart(1000);
+                        }
                     }
                     return;
                 }
@@ -4234,7 +4306,9 @@
                     openWebsiteDirectly(localCommand.value);
                     isProcessing = false;
                     setOrbState(STATE.IDLE);
-                    scheduleRestart(1200);
+                    if (cachedCredits && cachedCredits.remaining > 0) {
+                        scheduleRestart(1200);
+                    }
                     return;
                 }
 
@@ -4268,18 +4342,24 @@
                             isProcessing = false;
                             return;
                         }
+                        // Update cached credits
+                        if (data.credits) {
+                            cachedCredits = data.credits;
+                        }
                         streamResponse(data.response);
                         isProcessing = false;
                         if (!isStopped && state !== STATE.LISTENING && !isSpeakingNow) {
                             setTimeout(function() {
                                 if (state !== STATE.SPEAKING && !isStopped && !isSpeakingNow) {
                                     setOrbState(STATE.IDLE);
-                                    scheduleRestart(1000);
+                                    if (cachedCredits && cachedCredits.remaining > 0) {
+                                        scheduleRestart(1000);
+                                    }
                                 }
                             }, 500);
                         }
                         // Update credit display after response
-                        updateCreditDisplay();
+                        setTimeout(updateCreditDisplay, 300);
                     })
                     .catch(function(error) {
                         var errorMsg = error.message || 'Something went wrong';
@@ -4290,7 +4370,7 @@
                         }
                         setOrbState(STATE.IDLE);
                         isProcessing = false;
-                        updateCreditDisplay();
+                        setTimeout(updateCreditDisplay, 300);
                     });
             }
 
@@ -4300,7 +4380,11 @@
                     if (isSpeakingNow || state === STATE.SPEAKING || isProcessing) {
                         stopCurrentResponse();
                     } else {
-                        toggleListening();
+                        if (cachedCredits && cachedCredits.remaining > 0) {
+                            toggleListening();
+                        } else {
+                            addLimitMessage('Daily usage limit reached.');
+                        }
                     }
                 }
             });
@@ -4330,14 +4414,15 @@
                 assistantRoot.classList.add('dark-mode');
             }
 
-            setTimeout(updateCreditDisplay, 500);
+            // Initial credit fetch
+            setTimeout(function() {
+                updateCreditDisplay();
+            }, 1000);
 
-            console.log('Zishu AI v3.0 — Complete Credit System');
+            console.log('Zishu AI v3.0 — Credit System Fixed');
             console.log('Guest: 10 credits/day | Logged-in: 150 credits/day');
             console.log('Reset at 12:00 AM IST (Asia/Kolkata)');
             console.log('Backend: ' + BACKEND_URL);
-            console.log('Support Zishu section added with UPI');
-            console.log('FAQ updated for new model');
         })();
     </script>
 
