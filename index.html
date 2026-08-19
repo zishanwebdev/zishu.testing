@@ -3238,20 +3238,13 @@
 
 
         // ============================================================
-        // FIREBASE AUTH (FIXED)
+        // FIREBASE AUTH (unchanged)
         // ============================================================
         function setupAuthListener() {
             if (!auth) return;
             auth.onAuthStateChanged(function(user) {
                 currentUser = user;
                 updateUIForAuth(user);
-                // If premium modal was waiting for auth, close it after successful login
-                if (user) {
-                    const modal = document.getElementById('loginModal');
-                    if (modal.classList.contains('open')) {
-                        closeModal();
-                    }
-                }
             });
         }
 
@@ -3281,12 +3274,6 @@
             }
         }
 
-        // Properly expose closeModal globally
-        window.closeModal = function() {
-            const modal = document.getElementById('loginModal');
-            if (modal) modal.classList.remove('open');
-        };
-
         document.getElementById('googleSignInBtn').addEventListener('click', function() {
             if (!auth) {
                 alert('Authentication is not available. Please try again.');
@@ -3294,9 +3281,7 @@
             }
             var provider = new firebase.auth.GoogleAuthProvider();
             auth.signInWithPopup(provider)
-                .then(function(result) {
-                    // Close modal is handled by onAuthStateChanged
-                })
+                .then(function(result) { closeModal(); })
                 .catch(function(error) {
                     console.error('Google sign in error:', error);
                     var msg = 'Sign-in could not be completed. Please try again.';
@@ -3307,23 +3292,6 @@
                     }
                     alert(msg);
                 });
-        });
-
-        // Ensure guest continue works
-        document.getElementById('guestContinueBtn').addEventListener('click', function() {
-            closeModal();
-        });
-
-        // Ensure modal close works
-        document.getElementById('modalClose').addEventListener('click', function() {
-            closeModal();
-        });
-
-        // Click outside modal closes it
-        document.getElementById('loginModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeModal();
-            }
         });
 
 
@@ -4558,9 +4526,9 @@
             console.log('About Us page added with full language support');
             console.log('Hash-based navigation enabled');
             console.log('Support email is now a clickable button');
-            console.log('Firebase login fixed — modal closes on success');
         })();
     </script>
 
 </body>
 </html>
+ 
