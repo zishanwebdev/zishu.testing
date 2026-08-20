@@ -9,10 +9,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet" />
 
-    <!-- Firebase SDK -->
+    <!-- Firebase SDK (kept for potential future use, auth removed) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js">
-    </script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js">
     </script>
 
     <style>
@@ -247,49 +245,6 @@
             color: var(--text);
         }
 
-        .btn-google {
-            background: #ffffff;
-            color: #1a2332;
-            border: 1px solid var(--border);
-            padding: 0.5rem 1.4rem;
-            border-radius: 60px;
-            font-weight: 500;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        [data-theme="dark"] .btn-google {
-            background: #1a2332;
-            color: #e8edf5;
-        }
-        .btn-google:hover {
-            background: var(--surface2);
-        }
-        .btn-google svg {
-            width: 18px;
-            height: 18px;
-        }
-
-        .btn-premium-nav {
-            background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
-            color: #fff;
-            border: none;
-            padding: 0.4rem 1.2rem;
-            border-radius: 60px;
-            font-weight: 600;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: opacity 0.2s, transform 0.1s;
-            text-decoration: none;
-        }
-        .btn-premium-nav:hover {
-            opacity: 0.9;
-            transform: scale(0.97);
-        }
-
         .hamburger {
             display: none;
             flex-direction: column;
@@ -305,79 +260,6 @@
             background: var(--text);
             border-radius: 4px;
             transition: 0.2s;
-        }
-
-        /* User menu */
-        .user-menu {
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-            position: relative;
-        }
-        .user-avatar {
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            background: var(--accent);
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            font-size: 0.9rem;
-            cursor: pointer;
-            overflow: hidden;
-            border: 2px solid transparent;
-            transition: border-color 0.2s;
-        }
-        .user-avatar:hover {
-            border-color: var(--accent);
-        }
-        .user-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .user-name {
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: var(--text);
-            display: none;
-        }
-
-        .user-dropdown {
-            position: absolute;
-            top: calc(100% + 8px);
-            right: 0;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 0.6rem 0;
-            min-width: 180px;
-            box-shadow: var(--shadow-lg);
-            display: none;
-            z-index: 200;
-        }
-        .user-dropdown.open {
-            display: block;
-        }
-        .user-dropdown-item {
-            padding: 0.6rem 1.2rem;
-            font-size: 0.85rem;
-            color: var(--text);
-            cursor: pointer;
-            transition: background 0.15s;
-            border: none;
-            background: transparent;
-            width: 100%;
-            text-align: left;
-        }
-        .user-dropdown-item:hover {
-            background: var(--surface2);
-        }
-        .user-dropdown-divider {
-            border-top: 1px solid var(--border);
-            margin: 0.4rem 0;
         }
 
         /* ============================================================
@@ -398,13 +280,13 @@
         #explore-page {
             display: none;
         }
-        #premium-page {
+        #support-zishu-page {
             display: none;
         }
         #language-page {
             display: none;
         }
-        #support-page {
+        #customer-support-page {
             display: none;
         }
         #about-page {
@@ -1203,13 +1085,13 @@
         }
 
         /* ============================================================
-           PREMIUM PAGE (unchanged)
+           SUPPORT ZISHU PAGE (replaces Premium)
            ============================================================ */
-        .premium-hero {
+        .support-zishu-hero {
             text-align: center;
             padding: 2.5rem 0 2rem;
         }
-        .premium-hero .badge {
+        .support-zishu-hero .badge {
             display: inline-block;
             background: var(--accent-light);
             color: var(--accent);
@@ -1221,290 +1103,134 @@
             letter-spacing: 0.3px;
             border: 1px solid rgba(59, 130, 246, 0.15);
         }
-        .premium-hero h1 {
+        .support-zishu-hero h1 {
             font-size: 3rem;
             font-weight: 700;
             letter-spacing: -1.2px;
         }
-        .premium-hero h1 span {
+        .support-zishu-hero h1 span {
             color: var(--accent);
         }
-        .premium-hero p {
+        .support-zishu-hero p {
             color: var(--text-secondary);
             font-size: 1.1rem;
-            max-width: 520px;
+            max-width: 600px;
             margin: 0.6rem auto 1.5rem;
+            line-height: 1.7;
         }
 
-        .pricing-card-premium {
-            max-width: 420px;
+        .support-card {
+            max-width: 480px;
             margin: 0 auto 2rem;
             background: var(--surface);
-            border: 2px solid var(--accent);
+            border: 1px solid var(--border);
             border-radius: var(--radius-lg);
             padding: 2.5rem 2rem;
             text-align: center;
             box-shadow: var(--shadow-lg);
             position: relative;
-            overflow: hidden;
         }
-        .pricing-card-premium::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
-        }
-        .pricing-card-premium .price {
-            font-size: 3.6rem;
-            font-weight: 700;
-            letter-spacing: -1.5px;
-            margin: 0.3rem 0;
-        }
-        .pricing-card-premium .price-label {
-            color: var(--text-secondary);
-            font-weight: 500;
-            font-size: 1rem;
-        }
-        .pricing-card-premium .price-sub {
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-            margin-top: -0.2rem;
-        }
-        .pricing-card-premium .btn-premium-cta {
-            margin-top: 1.2rem;
-            width: 100%;
-            padding: 0.9rem;
-            font-size: 1.05rem;
+        .support-card .support-title {
+            font-size: 1.2rem;
             font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+        .support-card .support-desc {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.7;
+            margin-bottom: 1.8rem;
+        }
+        .support-card .btn-support-upi {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.9rem 2.5rem;
             background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
             color: #fff;
             border: none;
             border-radius: 60px;
+            font-weight: 600;
+            font-size: 1.05rem;
             cursor: pointer;
             transition: opacity 0.2s, transform 0.1s;
+            text-decoration: none;
+            width: 100%;
         }
-        .pricing-card-premium .btn-premium-cta:hover {
+        .support-card .btn-support-upi:hover {
             opacity: 0.9;
             transform: scale(0.98);
         }
-        .pricing-card-premium .btn-premium-cta:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
 
-        .premium-benefits {
-            margin: 3rem 0;
-        }
-        .premium-benefits .section-title {
+        .support-zishu-info {
+            margin: 2rem 0;
             text-align: center;
-            font-size: 2rem;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            margin-bottom: 0.2rem;
         }
-        .premium-benefits .section-sub {
-            text-align: center;
+        .support-zishu-info p {
             color: var(--text-secondary);
-            font-size: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .benefits-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.8rem;
-        }
-        .benefit-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 1.8rem 1.6rem;
-            text-align: center;
-            transition: 0.2s;
-            box-shadow: var(--shadow);
-        }
-        .benefit-card:hover {
-            transform: translateY(-4px);
-            border-color: var(--accent);
-        }
-        .benefit-card .benefit-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            background: var(--accent-light);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 0.8rem;
-            fill: var(--accent);
-        }
-        .benefit-card h4 {
-            font-weight: 600;
-            margin-bottom: 0.2rem;
-        }
-        .benefit-card p {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        /* Comparison Table */
-        .comparison-section {
-            margin: 3rem 0;
-        }
-        .comparison-section .section-title {
-            text-align: center;
-            font-size: 2rem;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            margin-bottom: 0.2rem;
-        }
-        .comparison-section .section-sub {
-            text-align: center;
-            color: var(--text-secondary);
-            font-size: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .comparison-table {
-            max-width: 640px;
+            font-size: 0.95rem;
+            line-height: 1.7;
+            max-width: 580px;
             margin: 0 auto;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            overflow: hidden;
-            box-shadow: var(--shadow);
-        }
-        .comparison-row {
-            display: grid;
-            grid-template-columns: 2fr 1.2fr 1.2fr;
-            padding: 1rem 1.5rem;
-            border-bottom: 1px solid var(--border);
-            align-items: center;
-        }
-        .comparison-row:last-child {
-            border-bottom: none;
-        }
-        .comparison-row.header {
-            background: var(--surface2);
-            font-weight: 600;
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-        }
-        .comparison-row .feature {
-            font-weight: 500;
-        }
-        .comparison-row .check {
-            color: var(--accent);
-            font-weight: 600;
-        }
-        .comparison-row .cross {
-            color: var(--text-secondary);
-            opacity: 0.4;
-        }
-        .comparison-row .premium-highlight {
-            color: var(--accent);
-            font-weight: 600;
         }
 
         /* ============================================================
-           LOGIN MODAL (unchanged)
+           CUSTOMER SUPPORT PAGE (renamed from Support)
            ============================================================ */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--modal-overlay);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-            z-index: 500;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 1.5rem;
-        }
-        .modal-overlay.open {
-            display: flex;
-        }
-
-        .modal {
+        .customer-support-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 2.5rem;
             background: var(--surface);
-            border-radius: 24px;
-            padding: 2.5rem 2.2rem;
-            max-width: 400px;
-            width: 100%;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            border-radius: var(--radius);
             border: 1px solid var(--border);
-            position: relative;
-            animation: modalFadeIn 0.25s ease;
-        }
-        @keyframes modalFadeIn {
-            from {
-                opacity: 0;
-                transform: scale(0.96) translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
+            box-shadow: var(--shadow);
+            text-align: center;
         }
 
-        .modal-close {
-            position: absolute;
-            top: 1rem;
-            right: 1.2rem;
-            background: transparent;
-            border: none;
-            font-size: 1.4rem;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: 0.2s;
-            padding: 0.2rem 0.5rem;
-            border-radius: 8px;
-        }
-        .modal-close:hover {
-            background: var(--surface2);
-        }
-
-        .modal h2 {
-            font-size: 1.5rem;
+        .customer-support-container h2 {
+            font-size: 2rem;
             font-weight: 700;
-            margin-bottom: 0.3rem;
+            margin-bottom: 0.5rem;
         }
-        .modal p {
+
+        .customer-support-container p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .customer-support-email-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 2rem;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 60px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            text-decoration: none;
+            margin-bottom: 1.5rem;
+        }
+        .customer-support-email-btn:hover {
+            background: var(--accent-secondary);
+            transform: scale(0.97);
+        }
+        .customer-support-email-btn svg {
+            width: 22px;
+            height: 22px;
+            fill: currentColor;
+        }
+
+        .customer-support-desc {
             color: var(--text-secondary);
             font-size: 0.95rem;
-            margin-bottom: 1.8rem;
-        }
-
-        .modal .btn-google {
-            width: 100%;
-            justify-content: center;
-            padding: 0.7rem;
-            font-size: 1rem;
-        }
-
-        .modal .guest-option {
-            display: block;
-            text-align: center;
-            margin-top: 1.2rem;
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            text-decoration: underline;
-            padding: 0.4rem;
-        }
-        .modal .guest-option:hover {
-            color: var(--text);
+            line-height: 1.6;
         }
 
         /* ============================================================
@@ -1561,63 +1287,6 @@
             border-color: var(--accent);
             background: var(--accent);
             color: #fff;
-        }
-
-        /* ============================================================
-           SUPPORT PAGE (unchanged, but email button updated)
-           ============================================================ */
-        .support-container {
-            max-width: 600px;
-            margin: 2rem auto;
-            padding: 2.5rem;
-            background: var(--surface);
-            border-radius: var(--radius);
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow);
-            text-align: center;
-        }
-
-        .support-container h2 {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .support-container p {
-            color: var(--text-secondary);
-            margin-bottom: 1.5rem;
-        }
-
-        .support-email-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 1rem 2rem;
-            background: var(--accent);
-            color: #fff;
-            border: none;
-            border-radius: 60px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
-            text-decoration: none;
-            margin-bottom: 1.5rem;
-        }
-        .support-email-btn:hover {
-            background: var(--accent-secondary);
-            transform: scale(0.97);
-        }
-        .support-email-btn svg {
-            width: 22px;
-            height: 22px;
-            fill: currentColor;
-        }
-
-        .support-desc {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-            line-height: 1.6;
         }
 
         /* ============================================================
@@ -1850,7 +1519,7 @@
            ============================================================ */
 
         @media (max-width: 1024px) {
-            .premium-hero h1 {
+            .support-zishu-hero h1 {
                 font-size: 2.6rem;
             }
             #zishu-chat-wrapper {
@@ -1888,13 +1557,10 @@
             .nav-links.open a {
                 font-size: 1rem;
             }
-            .user-name {
-                display: none;
-            }
             .explore-hero h1 {
                 font-size: 2.2rem;
             }
-            .premium-hero h1 {
+            .support-zishu-hero h1 {
                 font-size: 2.2rem;
             }
             .assistant-header h1 {
@@ -1967,32 +1633,20 @@
                 min-height: 180px;
                 max-height: 340px;
             }
-            .modal {
-                padding: 2rem 1.5rem;
-            }
-            .comparison-row {
-                grid-template-columns: 1.8fr 1fr 1fr;
-                padding: 0.8rem 1rem;
-                font-size: 0.85rem;
-            }
             .voice-notice {
                 font-size: 0.75rem;
                 padding: 0.5rem 1rem;
                 max-width: 100%;
             }
-            .pricing-card-premium {
+            .support-card {
                 padding: 2rem 1.5rem;
             }
-            .pricing-card-premium .price {
-                font-size: 3rem;
-            }
-            .benefits-grid {
-                grid-template-columns: 1fr;
-                max-width: 400px;
-                margin: 0 auto;
+            .support-card .btn-support-upi {
+                font-size: 0.95rem;
+                padding: 0.8rem 1.5rem;
             }
             .language-container,
-            .support-container {
+            .customer-support-container {
                 margin: 1rem auto;
                 padding: 1.5rem;
             }
@@ -2038,17 +1692,18 @@
             .explore-hero h1 {
                 font-size: 1.8rem;
             }
-            .premium-hero h1 {
+            .support-zishu-hero h1 {
                 font-size: 1.8rem;
             }
-            .premium-hero p {
+            .support-zishu-hero p {
                 font-size: 0.95rem;
             }
-            .pricing-card-premium {
+            .support-card {
                 padding: 1.5rem 1rem;
             }
-            .pricing-card-premium .price {
-                font-size: 2.6rem;
+            .support-card .btn-support-upi {
+                font-size: 0.9rem;
+                padding: 0.7rem 1.2rem;
             }
             #zishu-orb-wrapper {
                 width: 90px;
@@ -2128,17 +1783,6 @@
                 width: 14px;
                 height: 14px;
             }
-            .modal {
-                padding: 1.5rem 1.2rem;
-            }
-            .comparison-row {
-                grid-template-columns: 1.5fr 1fr 1fr;
-                padding: 0.6rem 0.8rem;
-                font-size: 0.75rem;
-            }
-            .comparison-row.header {
-                font-size: 0.7rem;
-            }
             .grid-2,
             .grid-3 {
                 grid-template-columns: 1fr;
@@ -2187,7 +1831,7 @@
             .founder-info h3 {
                 font-size: 1.2rem;
             }
-            .support-email-btn {
+            .customer-support-email-btn {
                 font-size: 0.95rem;
                 padding: 0.8rem 1.2rem;
             }
@@ -2217,47 +1861,13 @@
             .assistant-wrapper {
                 max-width: 880px;
             }
-            .benefits-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-        }
-
-        @media (min-width: 1024px) {
-            .premium-content-grid {
-                display: grid;
-                grid-template-columns: 1fr 1.2fr;
-                gap: 3rem;
-                align-items: start;
-                margin-top: 1rem;
-            }
-            .premium-content-grid .pricing-col {
-                order: 2;
-            }
-            .premium-content-grid .benefits-col {
-                order: 1;
-            }
-            .premium-benefits .benefits-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-            .about-grid-2 {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-
-        @media (max-width: 1023px) {
-            .premium-content-grid {
-                display: block;
-            }
-            .premium-content-grid .pricing-col {
-                margin-bottom: 2rem;
-            }
         }
     </style>
 </head>
 <body>
 
     <!-- ============================================================
-    NAV — updated with About Us
+    NAV — updated with Support Zishu and Customer Support
     ============================================================ -->
     <nav id="navbar">
         <div class="nav-inner">
@@ -2266,21 +1876,12 @@
                 <a class="active" data-page="home">Home</a>
                 <a data-page="explore">Explore</a>
                 <a data-page="about">About Us</a>
-                <a data-page="premium">Get Premium</a>
+                <a data-page="support-zishu">Support Zishu</a>
                 <a data-page="language">Language</a>
-                <a data-page="support">Support</a>
+                <a data-page="customer-support">Customer Support</a>
             </div>
             <div class="nav-actions">
                 <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">☀️</button>
-                <div class="user-menu" id="userMenu">
-                    <button class="btn-ghost" id="loginBtn">Sign in</button>
-                    <div class="user-avatar" id="userAvatar" style="display:none;"></div>
-                    <div class="user-dropdown" id="userDropdown">
-                        <div class="user-dropdown-item" id="dropdownProfile" style="font-weight:500;"></div>
-                        <div class="user-dropdown-divider"></div>
-                        <button class="user-dropdown-item" id="dropdownSignOut">Sign out</button>
-                    </div>
-                </div>
                 <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
             </div>
         </div>
@@ -2405,113 +2006,36 @@
             <div class="explore-section" id="faq-section">
                 <h2 class="section-title" id="faq-title">FAQ</h2>
                 <div id="faqContainer">
-                    <div class="faq-item"><div class="faq-question">What is Zishu? <span>+</span></div><div class="faq-answer">Zishu is a personal AI voice assistant that you can use directly from the web.</div></div>
-                    <div class="faq-item"><div class="faq-question">How do I use Zishu? <span>+</span></div><div class="faq-answer">Open Zishu, tap the Orb and start speaking.</div></div>
-                    <div class="faq-item"><div class="faq-question">Does Zishu support voice interaction? <span>+</span></div><div class="faq-answer">Yes. Zishu is designed around voice-first interaction.</div></div>
-                    <div class="faq-item"><div class="faq-question">Does Zishu understand Hindi? <span>+</span></div><div class="faq-answer">Yes, Zishu supports Hindi and English interaction.</div></div>
-                    <div class="faq-item"><div class="faq-question">Do I need to install an app? <span>+</span></div><div class="faq-answer">No. Zishu is available directly through the website.</div></div>
-                    <div class="faq-item"><div class="faq-question">Does Zishu require internet? <span>+</span></div><div class="faq-answer">Yes. AI processing requires an internet connection.</div></div>
-                    <div class="faq-item"><div class="faq-question">Is Zishu free? <span>+</span></div><div class="faq-answer">Zishu offers a free web version. Premium features are coming soon.</div></div>
+                    <div class="faq-item"><div class="faq-question">Can I use Zishu for free? <span>+</span></div><div class="faq-answer">Yes. Zishu can be used without purchasing a subscription or making a payment.</div></div>
+                    <div class="faq-item"><div class="faq-question">Do I need to create an account to use Zishu? <span>+</span></div><div class="faq-answer">No. You can use Zishu directly without creating an account or logging in.</div></div>
+                    <div class="faq-item"><div class="faq-question">Is there a Premium subscription? <span>+</span></div><div class="faq-answer">No. Zishu currently does not require a Premium subscription or paid plan.</div></div>
+                    <div class="faq-item"><div class="faq-question">Can I support Zishu? <span>+</span></div><div class="faq-answer">Yes. If you enjoy using Zishu and want to support its continued development, you can voluntarily support the project.</div></div>
+                    <div class="faq-item"><div class="faq-question">Is supporting Zishu required? <span>+</span></div><div class="faq-answer">No. Supporting Zishu is completely optional. You can continue using Zishu without making a donation.</div></div>
+                    <div class="faq-item"><div class="faq-question">How can I support Zishu? <span>+</span></div><div class="faq-answer">You can use the Support Zishu section to voluntarily support the project through the available UPI payment option.</div></div>
+                    <div class="faq-item"><div class="faq-question">Will supporting Zishu unlock Premium features? <span>+</span></div><div class="faq-answer">No. The support option is voluntary and is not a Premium purchase or subscription.</div></div>
                     <div class="faq-item"><div class="faq-question">What data does Zishu collect? <span>+</span></div><div class="faq-answer">Zishu processes voice input solely to respond to your requests. No personal data is stored without consent.</div></div>
                 </div>
             </div>
         </div>
 
         <!-- ============================================================
-        PREMIUM PAGE (unchanged)
+        SUPPORT ZISHU PAGE (replaces Premium)
         ============================================================ -->
-        <div id="premium-page">
-            <div class="premium-hero">
-                <div class="badge">Premium</div>
-                <h1>Get More From <span>Zishu</span></h1>
-                <p id="premium-desc">Unlock the full Zishu experience and make your AI assistant part of your everyday workflow.</p>
+        <div id="support-zishu-page">
+            <div class="support-zishu-hero">
+                <div class="badge">Support Zishu</div>
+                <h1>Support <span>Zishu</span></h1>
+                <p id="support-zishu-desc">If you enjoy using Zishu and would like to support its continued development and future improvements, you can support the project voluntarily.</p>
             </div>
-            <div class="premium-content-grid">
-                <div class="pricing-col">
-                    <div class="pricing-card-premium">
-                        <div class="price-label">Zishu Premium</div>
-                        <div class="price">₹99</div>
-                        <div class="price-sub">One-time purchase</div>
-                        <button class="btn-premium-cta" id="premiumCtaBtn">Get Premium</button>
-                    </div>
-                </div>
-                <div class="benefits-col">
-                    <div class="premium-benefits" style="margin-top:0;">
-                        <div class="benefits-grid">
-                            <div class="benefit-card">
-                                <div class="benefit-icon">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                                        <polyline points="9 12 11 14 15 10"/>
-                                    </svg>
-                                </div>
-                                <h4>Premium Access</h4>
-                                <p>Continue using Zishu with Premium access.</p>
-                            </div>
-                            <div class="benefit-card">
-                                <div class="benefit-icon">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <circle cx="12" cy="12" r="10"/>
-                                        <polyline points="12 6 12 12 16 14"/>
-                                    </svg>
-                                </div>
-                                <h4>Higher Daily Usage</h4>
-                                <p>Get up to 150 credits per day.</p>
-                            </div>
-                            <div class="benefit-card">
-                                <div class="benefit-icon">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
-                                        <line x1="8" y1="21" x2="16" y2="21"/>
-                                        <line x1="12" y1="17" x2="12" y2="21"/>
-                                    </svg>
-                                </div>
-                                <h4>Use Across Devices</h4>
-                                <p>Access your Zishu experience wherever you sign in.</p>
-                            </div>
-                            <div class="benefit-card">
-                                <div class="benefit-icon">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                                        <circle cx="12" cy="7" r="4"/>
-                                    </svg>
-                                </div>
-                                <h4>Premium Account</h4>
-                                <p>Your Premium access is connected to your account.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="support-card">
+                <div class="support-title">Voluntary Support</div>
+                <div class="support-desc">Supporting Zishu is completely optional. You can continue using Zishu without making any payment.</div>
+                <a class="btn-support-upi" href="upi://pay?pa=7654613259@fam&pn=Zishu%20AI" id="supportUpiBtn">
+                    Support Zishu
+                </a>
             </div>
-            <div class="comparison-section">
-                <h2 class="section-title" id="comparison-title">Guest vs Premium</h2>
-                <div class="comparison-table">
-                    <div class="comparison-row header">
-                        <span>Feature</span>
-                        <span>Guest</span>
-                        <span>Premium</span>
-                    </div>
-                    <div class="comparison-row">
-                        <span class="feature">Zishu access</span>
-                        <span class="check">Available</span>
-                        <span class="check">Available</span>
-                    </div>
-                    <div class="comparison-row">
-                        <span class="feature">Daily usage</span>
-                        <span>10 credits</span>
-                        <span class="premium-highlight">150 credits</span>
-                    </div>
-                    <div class="comparison-row">
-                        <span class="feature">Account required</span>
-                        <span class="cross">Optional</span>
-                        <span class="check">Required</span>
-                    </div>
-                    <div class="comparison-row">
-                        <span class="feature">Premium access</span>
-                        <span class="cross">No</span>
-                        <span class="check">Yes</span>
-                    </div>
-                </div>
+            <div class="support-zishu-info">
+                <p>Your support helps keep Zishu running and enables future improvements. Thank you for being part of this journey.</p>
             </div>
         </div>
 
@@ -2531,19 +2055,19 @@
         </div>
 
         <!-- ============================================================
-        SUPPORT PAGE — email as clickable button
+        CUSTOMER SUPPORT PAGE (renamed from Support)
         ============================================================ -->
-        <div id="support-page">
-            <div class="support-container">
-                <h2 id="support-title">Customer Support</h2>
-                <p id="support-desc">Need help? Reach out to our support team.</p>
-                <a href="mailto:support.stardustofficial@gmail.com" class="support-email-btn" id="supportEmailBtn">
+        <div id="customer-support-page">
+            <div class="customer-support-container">
+                <h2 id="customer-support-title">Customer Support</h2>
+                <p id="customer-support-desc">Need help? Reach out to our support team.</p>
+                <a href="mailto:support.stardustofficial@gmail.com" class="customer-support-email-btn" id="customerSupportEmailBtn">
                     <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
                         <path d="M22 4H2C.9 4 0 4.9 0 6v12c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-10 6L2 8V6l10 6 10-6v2z"/>
                     </svg>
                     support.stardustofficial@gmail.com
                 </a>
-                <p class="support-desc" id="support-info">We typically respond within 24-48 hours. For urgent issues, please include "URGENT" in the subject line.</p>
+                <p class="customer-support-desc" id="customer-support-info">We typically respond within 24-48 hours. For urgent issues, please include "URGENT" in the subject line.</p>
             </div>
         </div>
 
@@ -2695,9 +2219,9 @@
                 <a data-page="home">Home</a>
                 <a data-page="explore">Explore</a>
                 <a data-page="about">About Us</a>
-                <a data-page="premium">Get Premium</a>
+                <a data-page="support-zishu">Support Zishu</a>
                 <a data-page="language">Language</a>
-                <a data-page="support">Support</a>
+                <a data-page="customer-support">Customer Support</a>
                 <a href="privacy.html">Privacy</a>
                 <a href="terms.html">Terms</a>
             </div>
@@ -2709,28 +2233,11 @@
 
 
     <!-- ============================================================
-    LOGIN MODAL (unchanged)
-    ============================================================ -->
-    <div class="modal-overlay" id="loginModal">
-        <div class="modal">
-            <button class="modal-close" id="modalClose">×</button>
-            <h2 id="modal-title">Sign in to Zishu</h2>
-            <p id="modal-desc">Sign in to manage your account and access Premium when available.</p>
-            <button class="btn-google" id="googleSignInBtn">
-                <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-                Sign in with Google
-            </button>
-            <button class="guest-option" id="guestContinueBtn">Continue without signing in</button>
-        </div>
-    </div>
-
-
-    <!-- ============================================================
     JAVASCRIPT
     ============================================================ -->
     <script>
         // ============================================================
-        // LANGUAGE MANAGEMENT — updated with About Us translations
+        // LANGUAGE MANAGEMENT — updated with Support Zishu & Customer Support
         // ============================================================
         (function languageManager() {
             const LANG_STORAGE_KEY = 'zishu-language';
@@ -2742,9 +2249,9 @@
                     'nav-home': 'Home',
                     'nav-explore': 'Explore',
                     'nav-about': 'About Us',
-                    'nav-premium': 'Get Premium',
+                    'nav-support-zishu': 'Support Zishu',
                     'nav-language': 'Language',
-                    'nav-support': 'Support',
+                    'nav-customer-support': 'Customer Support',
 
                     // Home
                     'assistant-tagline': 'Your personal AI assistant',
@@ -2762,23 +2269,18 @@
                     'privacy-desc': 'Zishu uses a separate backend to handle AI requests so sensitive API credentials are not embedded directly in the client application.',
                     'faq-title': 'FAQ',
 
-                    // Premium
-                    'premium-desc': 'Unlock the full Zishu experience and make your AI assistant part of your everyday workflow.',
-                    'comparison-title': 'Guest vs Premium',
+                    // Support Zishu
+                    'support-zishu-desc': 'If you enjoy using Zishu and would like to support its continued development and future improvements, you can support the project voluntarily.',
+
+                    // Customer Support
+                    'customer-support-title': 'Customer Support',
+                    'customer-support-desc': 'Need help? Reach out to our support team.',
+                    'customer-support-info': 'We typically respond within 24-48 hours. For urgent issues, please include "URGENT" in the subject line.',
 
                     // Language
                     'lang-title': 'Choose Your Language',
                     'lang-desc': 'Select your preferred language for the Zishu interface.',
                     'lang-saved': 'Your language preference is saved automatically.',
-
-                    // Support
-                    'support-title': 'Customer Support',
-                    'support-desc': 'Need help? Reach out to our support team.',
-                    'support-info': 'We typically respond within 24-48 hours. For urgent issues, please include "URGENT" in the subject line.',
-
-                    // Modal
-                    'modal-title': 'Sign in to Zishu',
-                    'modal-desc': 'Sign in to manage your account and access Premium when available.',
 
                     // Footer
                     'footer-tagline': 'Your voice. Your assistant.',
@@ -2811,9 +2313,9 @@
                     'nav-home': 'होम',
                     'nav-explore': 'एक्सप्लोर',
                     'nav-about': 'हमारे बारे में',
-                    'nav-premium': 'प्रीमियम लें',
+                    'nav-support-zishu': 'Zishu को सपोर्ट करें',
                     'nav-language': 'भाषा',
-                    'nav-support': 'सहायता',
+                    'nav-customer-support': 'ग्राहक सहायता',
 
                     // Home
                     'assistant-tagline': 'आपका निजी AI सहायक',
@@ -2831,23 +2333,18 @@
                     'privacy-desc': 'Zishu AI अनुरोधों को संभालने के लिए एक अलग बैकेंड का उपयोग करता है ताकि संवेदनशील API क्रेडेंशियल्स सीधे क्लाइंट एप्लिकेशन में एम्बेड न हों।',
                     'faq-title': 'सामान्य प्रश्न',
 
-                    // Premium
-                    'premium-desc': 'Zishu का पूरा अनुभव प्राप्त करें और अपने AI सहायक को अपनी दैनिक दिनचर्या का हिस्सा बनाएं।',
-                    'comparison-title': 'अतिथि बनाम प्रीमियम',
+                    // Support Zishu
+                    'support-zishu-desc': 'यदि आप Zishu का उपयोग करना पसंद करते हैं और इसके निरंतर विकास और भविष्य के सुधारों का समर्थन करना चाहते हैं, तो आप स्वेच्छा से परियोजना का समर्थन कर सकते हैं।',
+
+                    // Customer Support
+                    'customer-support-title': 'ग्राहक सहायता',
+                    'customer-support-desc': 'मदद चाहिए? हमारी सहायता टीम से संपर्क करें।',
+                    'customer-support-info': 'हम आमतौर पर 24-48 घंटों के भीतर जवाब देते हैं। तत्काल मामलों के लिए, कृपया विषय पंक्ति में "URGENT" शामिल करें।',
 
                     // Language
                     'lang-title': 'अपनी भाषा चुनें',
                     'lang-desc': 'Zishu इंटरफेस के लिए अपनी पसंदीदा भाषा चुनें।',
                     'lang-saved': 'आपकी भाषा प्राथमिकता स्वचालित रूप से सहेजी गई है।',
-
-                    // Support
-                    'support-title': 'ग्राहक सहायता',
-                    'support-desc': 'मदद चाहिए? हमारी सहायता टीम से संपर्क करें।',
-                    'support-info': 'हम आमतौर पर 24-48 घंटों के भीतर जवाब देते हैं। तत्काल मामलों के लिए, कृपया विषय पंक्ति में "URGENT" शामिल करें।',
-
-                    // Modal
-                    'modal-title': 'Zishu में साइन इन करें',
-                    'modal-desc': 'अपना खाता प्रबंधित करने और प्रीमियम उपलब्ध होने पर उसका उपयोग करने के लिए साइन इन करें।',
 
                     // Footer
                     'footer-tagline': 'आपकी आवाज़। आपका सहायक।',
@@ -2902,16 +2399,13 @@
                     'privacy-title': 'privacy-title',
                     'privacy-desc': 'privacy-desc',
                     'faq-title': 'faq-title',
-                    'premium-desc': 'premium-desc',
-                    'comparison-title': 'comparison-title',
+                    'support-zishu-desc': 'support-zishu-desc',
+                    'customer-support-title': 'customer-support-title',
+                    'customer-support-desc': 'customer-support-desc',
+                    'customer-support-info': 'customer-support-info',
                     'lang-title': 'lang-title',
                     'lang-desc': 'lang-desc',
                     'lang-saved': 'lang-saved',
-                    'support-title': 'support-title',
-                    'support-desc': 'support-desc',
-                    'support-info': 'support-info',
-                    'modal-title': 'modal-title',
-                    'modal-desc': 'modal-desc',
                     'footer-tagline': 'footer-tagline',
                     // About
                     'about-hero-desc': 'about-hero-desc',
@@ -3008,7 +2502,7 @@
 
 
         // ============================================================
-        // FIREBASE CONFIG (unchanged)
+        // FIREBASE CONFIG (kept for potential future use, auth removed)
         // ============================================================
         const firebaseConfig = {
             apiKey: "AIzaSyCV69BI7Rw-4o4yHQxBp-v0dXvEl7Tpmq0",
@@ -3022,14 +2516,11 @@
         };
 
         let firebaseInitialized = false;
-        let auth = null;
-        let currentUser = null;
 
         function initFirebase() {
             if (firebaseInitialized) return;
             try {
                 firebase.initializeApp(firebaseConfig);
-                auth = firebase.auth();
                 firebaseInitialized = true;
             } catch (e) {
                 console.warn('Firebase init error:', e);
@@ -3038,7 +2529,7 @@
 
 
         // ============================================================
-        // MARKETING — Theme, Nav, FAQ, Page Switching (updated with About & hash)
+        // MARKETING — Theme, Nav, FAQ, Page Switching (updated with new pages & hash)
         // ============================================================
         (function marketing() {
             // Theme
@@ -3081,9 +2572,9 @@
             // Pages
             const homePage = document.getElementById('home-page');
             const explorePage = document.getElementById('explore-page');
-            const premiumPage = document.getElementById('premium-page');
+            const supportZishuPage = document.getElementById('support-zishu-page');
             const languagePage = document.getElementById('language-page');
-            const supportPage = document.getElementById('support-page');
+            const customerSupportPage = document.getElementById('customer-support-page');
             const aboutPage = document.getElementById('about-page');
             const navLinksItems = navLinks.querySelectorAll('a[data-page]');
             const footerLinks = document.querySelectorAll('footer a[data-page]');
@@ -3094,17 +2585,17 @@
                 // Hide all
                 homePage.style.display = 'none';
                 explorePage.style.display = 'none';
-                premiumPage.style.display = 'none';
+                supportZishuPage.style.display = 'none';
                 languagePage.style.display = 'none';
-                supportPage.style.display = 'none';
+                customerSupportPage.style.display = 'none';
                 aboutPage.style.display = 'none';
 
                 // Show selected
                 if (page === 'home') homePage.style.display = 'block';
                 else if (page === 'explore') explorePage.style.display = 'block';
-                else if (page === 'premium') premiumPage.style.display = 'block';
+                else if (page === 'support-zishu') supportZishuPage.style.display = 'block';
                 else if (page === 'language') languagePage.style.display = 'block';
-                else if (page === 'support') supportPage.style.display = 'block';
+                else if (page === 'customer-support') customerSupportPage.style.display = 'block';
                 else if (page === 'about') aboutPage.style.display = 'block';
 
                 // Update nav active
@@ -3151,13 +2642,13 @@
 
             // About Support button
             document.getElementById('aboutSupportBtn').addEventListener('click', function() {
-                switchPage('support');
+                switchPage('customer-support');
             });
 
             // Hash-based routing on load
             function handleHash() {
                 const hash = window.location.hash.replace('#', '');
-                if (hash && ['home', 'explore', 'about', 'premium', 'language', 'support'].includes(hash)) {
+                if (hash && ['home', 'explore', 'about', 'support-zishu', 'language', 'customer-support'].includes(hash)) {
                     switchPage(hash);
                 } else {
                     switchPage('home');
@@ -3181,118 +2672,8 @@
                 });
             });
 
-            // Modal controls
-            const modal = document.getElementById('loginModal');
-            const modalClose = document.getElementById('modalClose');
-            const guestContinue = document.getElementById('guestContinueBtn');
-
-            function openModal() { modal.classList.add('open'); }
-
-            function closeModal() { modal.classList.remove('open'); }
-
-            modalClose.addEventListener('click', closeModal);
-            modal.addEventListener('click', function(e) { if (e.target === modal) closeModal(); });
-            guestContinue.addEventListener('click', closeModal);
-
-            window.openLoginModal = openModal;
-            window.closeLoginModal = closeModal;
-
-            // Premium CTA
-            document.getElementById('premiumCtaBtn').addEventListener('click', function() {
-                if (currentUser) {
-                    alert('Premium purchase will be available here.');
-                } else {
-                    openModal();
-                }
-            });
-
-            // Login button
-            document.getElementById('loginBtn').addEventListener('click', function() {
-                if (currentUser) {
-                    document.getElementById('userDropdown').classList.toggle('open');
-                } else {
-                    openModal();
-                }
-            });
-
-            document.addEventListener('click', function(e) {
-                const menu = document.getElementById('userMenu');
-                const dropdown = document.getElementById('userDropdown');
-                if (menu && !menu.contains(e.target)) {
-                    dropdown.classList.remove('open');
-                }
-            });
-
-            document.getElementById('dropdownSignOut').addEventListener('click', function() {
-                if (auth) {
-                    auth.signOut().catch(function(e) { console.warn('Sign out error:', e); });
-                }
-                document.getElementById('userDropdown').classList.remove('open');
-            });
-
-            window.switchPage = switchPage;
             initFirebase();
-            setupAuthListener();
-
         })();
-
-
-        // ============================================================
-        // FIREBASE AUTH (unchanged)
-        // ============================================================
-        function setupAuthListener() {
-            if (!auth) return;
-            auth.onAuthStateChanged(function(user) {
-                currentUser = user;
-                updateUIForAuth(user);
-            });
-        }
-
-        function updateUIForAuth(user) {
-            const loginBtn = document.getElementById('loginBtn');
-            const avatar = document.getElementById('userAvatar');
-            const dropdownProfile = document.getElementById('dropdownProfile');
-            const dropdown = document.getElementById('userDropdown');
-
-            if (user) {
-                loginBtn.style.display = 'none';
-                avatar.style.display = 'flex';
-                const displayName = user.displayName || 'User';
-                const photoURL = user.photoURL;
-                if (photoURL) {
-                    avatar.innerHTML = '<img src="' + photoURL + '" alt="' + displayName + '" />';
-                } else {
-                    avatar.textContent = displayName.charAt(0).toUpperCase();
-                }
-                dropdownProfile.textContent = displayName + ' (' + (user.email || '') + ')';
-            } else {
-                loginBtn.style.display = 'block';
-                avatar.style.display = 'none';
-                avatar.innerHTML = '';
-                dropdownProfile.textContent = '';
-                dropdown.classList.remove('open');
-            }
-        }
-
-        document.getElementById('googleSignInBtn').addEventListener('click', function() {
-            if (!auth) {
-                alert('Authentication is not available. Please try again.');
-                return;
-            }
-            var provider = new firebase.auth.GoogleAuthProvider();
-            auth.signInWithPopup(provider)
-                .then(function(result) { closeModal(); })
-                .catch(function(error) {
-                    console.error('Google sign in error:', error);
-                    var msg = 'Sign-in could not be completed. Please try again.';
-                    if (error.code === 'auth/popup-blocked') {
-                        msg = 'Sign-in popup was blocked. Please allow popups for this site.';
-                    } else if (error.code === 'auth/popup-closed-by-user') {
-                        msg = 'Sign-in was cancelled.';
-                    }
-                    alert(msg);
-                });
-        });
 
 
         // ============================================================
@@ -4520,15 +3901,16 @@
             console.log('Chat area enlarged');
             console.log('Tap Orb to start');
             console.log('First-time voice notice added');
-            console.log('Get Premium page created');
-            console.log('Language & Support pages added');
+            console.log('Support Zishu page added (replaces Premium)');
+            console.log('Customer Support page added (renamed from Support)');
+            console.log('Language & Customer Support pages added');
             console.log('Privacy & Terms linked to real files');
             console.log('About Us page added with full language support');
             console.log('Hash-based navigation enabled');
             console.log('Support email is now a clickable button');
+            console.log('Login system removed - Zishu is now fully free to use');
         })();
     </script>
 
 </body>
 </html>
- 
